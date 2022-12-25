@@ -2,13 +2,13 @@
   "name": "@ihaz/react-ui-utils",
   "version": "1.0.0",
   "description": "A general UI common methods for React Projects, supports React Dom and React Native",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
   "files": [
     "dist"
   ],
   "type": "module",
-  "types": "lib/index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
