@@ -1,1 +1,2 @@
-export * from "./Viewer";
+import { createViewManager } from "./Viewer";
+export { createViewManager };

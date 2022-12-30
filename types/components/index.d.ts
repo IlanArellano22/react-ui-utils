@@ -1,1 +1,2 @@
-export * from "./manager";
+import { createViewManager } from "./manager";
+export { createViewManager };

@@ -16,7 +16,7 @@ export interface ViewManager {
 const NOT_INSTANCE_ERROR =
   "El componente aun no ha sido añadido al arbol de componentes o no esta siendo accesible";
 
-let i = 0;
+/**Comentario */
 export function createViewManager(): ViewManager {
   let instance: ViewManagerComponent | undefined = undefined;
   let queue: ((instance: ViewManagerComponent) => void)[] = [];

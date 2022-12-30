@@ -6,4 +6,5 @@ export interface ViewManager {
     showSync: ShowViewFuncSync;
     removeAllEntries: () => void;
 }
+/**Comentario */
 export declare function createViewManager(): ViewManager;
