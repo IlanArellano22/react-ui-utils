@@ -2,29 +2,37 @@
   "name": "@ihaz/react-ui-utils",
   "version": "1.0.0",
   "description": "A general UI common methods for React Projects, supports React Dom and React Native.",
-  "main": "lib/index.js",
-  "bin": "lib/index.js",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
   "files": [
-    "lib",
-    "types"
+    "lib"
   ],
-  "type": "module",
-  "types": "types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir lib/cjs"
   },
   "keywords": [
     "react",
     "react-utils",
     "react native"
   ],
-  "author": "",
+  "author": "Ilan Arellano",
   "license": "ISC",
+  "peerDependencies": {
+    "react": ">=16"
+  },
   "devDependencies": {
     "@babel/core": "^7.20.5",
     "@types/react": "^18.0.26",
     "babel-plugin-module-resolver": "^4.1.0",
     "react": "^18.2.0",
+    "tslib": "^2.4.1",
     "typescript": "^4.9.3"
   }
 }

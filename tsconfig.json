@@ -1,25 +1,30 @@
 {
+  "include": ["src"],
+  "exclude": [
+    "lib",
+    "node_modules"
+  ],
   "compilerOptions": {
-    "target": "ES6",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@app/*": ["./src/*"]
     },
-
-    // Added
-    "jsx": "react",
-    "module": "CommonJS",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
     "declaration": true,
-    "declarationDir": "types",
     "sourceMap": true,
-    "outDir": "./lib",
+    "rootDir": "./src",
+    "outDir": "./lib/esm",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["./src/**/*.tsx", "./src/**/*.ts"],
-  "exclude": ["node_modules"]
+    "jsx": "react",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+  }
 }

@@ -1,3 +1,4 @@
+import { Sleep } from "@app/common";
 import React from "react";
 import {
   type ViewComponentProps,
@@ -5,6 +6,7 @@ import {
   type ViewProps,
   ViewMainComponent,
 } from "./comp";
+import { ViewManagerOptions } from "./create";
 
 const MODAL_LIMIT = 3;
 
@@ -22,11 +24,17 @@ export type ShowToastFunc<TProps> = (
 ) => void;
 
 export interface ViewSyncResult<IResult> {
+  start: () => void;
   /**Cierra el modal instanciado, devolviendo el resultado que previamente
    * fue seteado con la llamada @see `onClose` en caso de no ser llamado
    * devolvera undefined
    */
   close: () => IResult;
+}
+
+export interface ViewSyncOptions {
+  duration: number;
+  delay: number;
 }
 
 export interface ShowViewFuncSync {
@@ -41,11 +49,13 @@ export interface ShowViewFuncSync {
     : unknown;
 }
 
+interface ViewMainProps extends ViewManagerOptions {}
+
 export class ViewManagerComponent extends React.PureComponent<
-  {},
+  ViewMainProps,
   ViewComponentProps
 > {
-  constructor(props: {}) {
+  constructor(props: ViewMainProps) {
     super(props);
     this.state = {
       views: [],
@@ -77,12 +87,33 @@ export class ViewManagerComponent extends React.PureComponent<
     });
   };
 
+  private handleStartSync =
+    (entry: ViewEntry, options?: Partial<ViewSyncOptions>) => () => {
+      if (options) {
+        (async () => {
+          if (options.delay) await Sleep(options.delay);
+          this.addEntry(entry);
+          if (options.duration) {
+            Sleep(options.duration).then(() => {
+              this.removeEntry(entry.id);
+            });
+          }
+        })();
+        return;
+      }
+      this.addEntry(entry);
+    };
+
   showViewSync = (
     render: React.ComponentType<ViewProps>,
-    props: {}
+    props: {},
+    options?: Partial<ViewSyncOptions>
   ): ViewSyncResult<any> => {
-    if (this.state.views.length > MODAL_LIMIT)
-      return { close: (() => this.removeAll()).bind(this) };
+    if (this.props.limit && this.state.views.length > this.props.limit)
+      return {
+        close: (() => this.removeAll()).bind(this),
+        start: (() => this.removeAll()).bind(this),
+      };
     const currId = this.state.nextId;
     let result: any;
 
@@ -97,9 +128,10 @@ export class ViewManagerComponent extends React.PureComponent<
       },
     };
 
-    this.addEntry(entry);
-
-    return { close: this.handleCloseSync(currId, result) };
+    return {
+      close: this.handleCloseSync(currId, result),
+      start: this.handleStartSync(entry, options),
+    };
   };
 
   removeAllEntries = () => {
@@ -109,11 +141,6 @@ export class ViewManagerComponent extends React.PureComponent<
   removeAll = () => {
     if (this.state.views.length === 0) return;
     this.setState(() => ({ views: [] }));
-  };
-
-  private removeSomeEntries = (condition: (x: ViewEntry) => boolean) => {
-    if (this.state.views.length === 0) return;
-    this.setState((prev) => ({ views: prev.views.filter(condition) }));
   };
 
   private addEntry = (entry: ViewEntry) => {
