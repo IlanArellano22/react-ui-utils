@@ -1,5 +1,5 @@
 import React from "react";
-export type OnCloseResult<T> = undefined extends T ? (result?: T) => void : (result: T) => void;
+export declare type OnCloseResult<T> = undefined extends T ? (result?: T) => void : (result: T) => void;
 export interface ViewProps<IResult = any> {
     onClose: OnCloseResult<IResult>;
 }

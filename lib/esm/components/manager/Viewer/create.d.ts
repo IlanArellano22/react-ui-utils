@@ -6,5 +6,8 @@ export interface ViewManager {
     showSync: ShowViewFuncSync;
     removeAllEntries: () => void;
 }
+export interface ViewManagerOptions {
+    limit?: number;
+}
 /**Comentario */
-export declare function createViewManager(): ViewManager;
+export declare function createViewManager(options: Partial<ViewManagerOptions>): ViewManager;

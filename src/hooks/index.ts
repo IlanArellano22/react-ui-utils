@@ -1,1 +1,4 @@
-export { useEffectAsync } from "./useEffectAsync";
+import { useEffectAsync } from "./useEffectAsync";
+import { useEffectInterval } from "./useEffectInterval";
+
+export { useEffectAsync, useEffectInterval };
