@@ -13,11 +13,17 @@ export interface ViewManager {
   removeAllEntries: () => void;
 }
 
+export interface ViewManagerOptions {
+  limit?: number;
+}
+
 const NOT_INSTANCE_ERROR =
   "El componente aun no ha sido añadido al arbol de componentes o no esta siendo accesible";
 
-let i = 0;
-export function createViewManager(): ViewManager {
+/**Comentario */
+export function createViewManager(
+  options: Partial<ViewManagerOptions>
+): ViewManager {
   let instance: ViewManagerComponent | undefined = undefined;
   let queue: ((instance: ViewManagerComponent) => void)[] = [];
 
@@ -33,7 +39,9 @@ export function createViewManager(): ViewManager {
     processQueue();
   };
 
-  const Viewer = () => <ViewManagerComponent ref={handleRef} />;
+  const Viewer = () => (
+    <ViewManagerComponent ref={handleRef} limit={options.limit} />
+  );
   const show: ShowViewFunc = (
     render: React.ComponentType<ViewProps>,
     props?: any
