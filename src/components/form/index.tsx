@@ -1,6 +1,11 @@
-import React, { createContext, forwardRef } from "react";
+import React, {
+  createContext,
+  forwardRef,
+  PropsWithChildren,
+  useContext,
+} from "react";
 import { ValForm, ValFormAsync } from "@app/types";
-import { omit } from "@app/common";
+import { ControlView } from "./controlView";
 
 interface FormContext<T = any> {
   value: T | undefined;
@@ -12,15 +17,17 @@ interface FormContext<T = any> {
 }
 
 interface FormManager<T> {
-  Form: () => JSX.Element;
+  Form: <T>(props: PropsWithChildren<FormProps<T>>) => JSX.Element;
   Field: <TProps extends { [k: string]: any }>(
     props: FieldProps<TProps, T>
   ) => JSX.Element;
 }
 
-interface FormProps {}
+interface FormProps<T> {
+  onSubmit?: (result: T) => void;
+}
 
-type FieldProps<TProps extends { [k: string]: any }, T> = {
+export type FieldProps<TProps extends { [k: string]: any }, T> = {
   render: React.ComponentType<TProps>;
   field: keyof T;
   ref?: React.Ref<any>;
@@ -29,23 +36,38 @@ type FieldProps<TProps extends { [k: string]: any }, T> = {
     onChange?: TProps["onChange"] | null;
   });
 
-const FieldControl = forwardRef<FieldProps<any, any>>((props, ref) => {
-  return <></>;
-});
-
 export function createFormManager<T>(initial: T): FormManager<T> {
+  const initialObj: FormContext<T> = {
+    value: initial,
+    props: {},
+    validation: {},
+    onChange: () => {},
+  };
   const FormCxt = createContext<FormContext>(
-    undefined as unknown as FormContext
+    undefined as unknown as FormContext<T>
   );
 
-  function Form() {
-    return <></>;
+  function Form<T>(props: PropsWithChildren<FormProps<T>>) {
+    return (
+      <FormCxt.Provider value={initialObj}>{props.children}</FormCxt.Provider>
+    );
   }
 
   function Field<TProps extends { [k: string]: any }>(
     props: FieldProps<TProps, T>
   ) {
-    return <FormCxt.Consumer>{(formctx) => <></>}</FormCxt.Consumer>;
+    return (
+      <FormCxt.Consumer>
+        {(formctx) => {
+          function handleChange<Key extends keyof T>(
+            key: Key,
+            newValue: T[Key]
+          ) {}
+
+          return <ControlView {...props} />;
+        }}
+      </FormCxt.Consumer>
+    );
   }
 
   return { Field, Form };
