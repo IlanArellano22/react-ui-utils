@@ -1,5 +1,5 @@
 import { EffectCallback, useEffect, useRef, DependencyList } from "react";
-import { intervalHandler } from "@app/helpers/intervalHandler";
+import { intervalHandler } from "../helpers";
 
 type EffectResult = void | EffectCallback;
 

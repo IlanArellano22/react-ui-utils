@@ -1,13 +1,10 @@
 {
   "include": ["src"],
-  "exclude": [
-    "lib",
-    "node_modules"
-  ],
+  "exclude": ["lib", "node_modules"],
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@app/*": ["./src/*"]
+      "@app/*": ["*"]
     },
     "module": "esnext",
     "lib": ["dom", "esnext"],
@@ -25,6 +22,6 @@
     "jsx": "react",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   }
 }

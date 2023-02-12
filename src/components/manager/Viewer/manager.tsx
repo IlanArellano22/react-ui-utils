@@ -1,4 +1,4 @@
-import { Sleep } from "@app/common";
+import { Sleep } from "../../../common";
 import React from "react";
 import {
   type ViewComponentProps,

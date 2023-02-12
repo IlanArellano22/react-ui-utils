@@ -1,2 +1,3 @@
 import { createViewManager } from "./manager";
-export { createViewManager };
+import { createFormManager } from "./form";
+export { createViewManager, createFormManager };

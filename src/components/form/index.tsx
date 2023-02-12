@@ -1,11 +1,6 @@
-import React, {
-  createContext,
-  forwardRef,
-  PropsWithChildren,
-  useContext,
-} from "react";
-import { ValForm, ValFormAsync } from "@app/types";
-import { ControlView } from "./controlView";
+import React, { createContext, PropsWithChildren, PureComponent } from "react";
+import { ValForm, ValFormAsync } from "../../types";
+import { ControlForm, ControlView } from "./controlView";
 
 interface FormContext<T = any> {
   value: T | undefined;
@@ -13,19 +8,25 @@ interface FormContext<T = any> {
   onChange:
     | (<Key extends keyof T>(field: Key, value: T[Key]) => void)
     | undefined;
-  props: { [key: string]: any };
 }
 
 interface FormManager<T> {
-  Form: <T>(props: PropsWithChildren<FormProps<T>>) => JSX.Element;
+  Form: <TProps extends { [k: string]: any }>(
+    props: PropsWithChildren<FormProps<T, TProps>>
+  ) => JSX.Element;
   Field: <TProps extends { [k: string]: any }>(
     props: FieldProps<TProps, T>
   ) => JSX.Element;
 }
 
-interface FormProps<T> {
+export type FormProps<T, TProps extends { [k: string]: any }> = {
+  render: React.ComponentType<TProps>;
+  ref?: React.Ref<any>;
   onSubmit?: (result: T) => void;
-}
+} & (Partial<Pick<TProps, "value">> &
+  Pick<TProps, Exclude<keyof TProps, "value" | "onChange">> & {
+    onChange?: TProps["onChange"] | null;
+  });
 
 export type FieldProps<TProps extends { [k: string]: any }, T> = {
   render: React.ComponentType<TProps>;
@@ -36,21 +37,42 @@ export type FieldProps<TProps extends { [k: string]: any }, T> = {
     onChange?: TProps["onChange"] | null;
   });
 
-export function createFormManager<T>(initial: T): FormManager<T> {
-  const initialObj: FormContext<T> = {
-    value: initial,
-    props: {},
-    validation: {},
-    onChange: () => {},
-  };
+export function createFormManager<T>(initial: T) {
   const FormCxt = createContext<FormContext>(
     undefined as unknown as FormContext<T>
   );
 
-  function Form<T>(props: PropsWithChildren<FormProps<T>>) {
-    return (
-      <FormCxt.Provider value={initialObj}>{props.children}</FormCxt.Provider>
-    );
+  class Form<TProps extends { [k: string]: any }> extends PureComponent<
+    TProps,
+    { value: T }
+  > {
+    constructor(props: TProps) {
+      super(props);
+      this.state = {
+        value: initial,
+      };
+    }
+
+    handleChange = <Key extends keyof T>(field: Key, value: T[Key]) => {
+      console.log("change", field, value);
+      this.setState((prev) => ({ ...prev, [field]: value }));
+    };
+
+    render() {
+      const { value } = this.state;
+      return (
+        <FormCxt.Provider
+          value={{
+            value,
+            // @ts-ignore: Unreachable code error
+            onChange: this.handleChange.bind(this),
+            validation: {},
+          }}
+        >
+          <ControlForm {...this.props} />
+        </FormCxt.Provider>
+      );
+    }
   }
 
   function Field<TProps extends { [k: string]: any }>(
@@ -62,9 +84,20 @@ export function createFormManager<T>(initial: T): FormManager<T> {
           function handleChange<Key extends keyof T>(
             key: Key,
             newValue: T[Key]
-          ) {}
+          ) {
+            if (formctx.onChange) formctx.onChange(key, newValue);
+          }
 
-          return <ControlView {...props} />;
+          const isDisabled = props.onChange === null || props.disabled;
+
+          return (
+            <ControlView
+              {...props}
+              value={formctx.value[props.field]}
+              onChange={!isDisabled && handleChange}
+              disabled={isDisabled}
+            />
+          );
         }}
       </FormCxt.Consumer>
     );
