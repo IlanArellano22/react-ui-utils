@@ -3,9 +3,6 @@
   "exclude": ["lib", "node_modules"],
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": {
-      "@app/*": ["*"]
-    },
     "module": "esnext",
     "lib": ["dom", "esnext"],
     "importHelpers": true,
