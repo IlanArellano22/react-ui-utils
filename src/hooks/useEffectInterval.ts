@@ -3,12 +3,12 @@ import { intervalHandler } from "../helpers";
 
 type EffectResult = void | EffectCallback;
 
-export const useEffectInterval = (
+export default function useEffectInterval(
   effect: () => EffectResult,
   deps: DependencyList,
   interval: number,
   inmediate = false
-) => {
+) {
   const intervalRef = useRef(new intervalHandler()).current;
   useEffect(() => {
     let effectRes: EffectResult | undefined;
@@ -21,4 +21,4 @@ export const useEffectInterval = (
       intervalRef.clear();
     };
   }, deps);
-};
+}

@@ -8,14 +8,14 @@ export interface ViewProps<IResult = any> {
   onClose: OnCloseResult<IResult>;
 }
 
-export interface ViewEntry {
+export interface Entry {
   id: number;
   render: React.ComponentType<ViewProps>;
   props: ViewProps;
 }
 
 export interface ViewComponentProps {
-  views: ViewEntry[];
+  views: Entry[];
   nextId: number;
 }
 
