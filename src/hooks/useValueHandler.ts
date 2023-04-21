@@ -1,5 +1,4 @@
-import { useMemo, useRef } from "react";
-import { omit } from "common";
+import { useCallback, useRef } from "react";
 import { BaseHandler, ValueHandler } from "../common/classes/ValueHandler";
 
 type Value<IValue> = IValue | (() => IValue);
@@ -31,10 +30,7 @@ export default function useValueHandler<IValue>(
     if (cb) cb(final);
   };
 
-  const valueMethods = useMemo(
-    () => omit(value as ValueHandler<IValue>, "get", "set"),
-    []
-  );
+  const getDeepCopy = useCallback(() => value.getDeepCopy() as IValue, []);
 
-  return [get, set, valueMethods];
+  return [get, set, { getDeepCopy }];
 }

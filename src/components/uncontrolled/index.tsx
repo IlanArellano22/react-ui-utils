@@ -36,6 +36,7 @@ type Methods<
 
 export type UncontrolledComponent<P> = {
   Component: (props: P) => JSX.Element;
+  isInstanceMounted: () => boolean;
 };
 
 /**Genera una React Class Component cuyos methodos pueden ser manipulados por otros componentes sin necesidad de estar controlado por props */
@@ -54,6 +55,8 @@ export default function createUncontrolledClassComponent<
     instance = x;
   };
 
+  const isInstanceMounted = () => !!instance;
+
   const Component = (props: Readonly<P>) => (
     <Comp {...(props ?? {})} ref={handleRef} />
   );
@@ -69,5 +72,5 @@ export default function createUncontrolledClassComponent<
     })
   ) as Methods<IComponent, IMethods>;
 
-  return { Component, ...final };
+  return { Component, isInstanceMounted, ...final };
 }
