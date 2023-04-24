@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, PureComponent } from "react";
+import React, { createContext, PureComponent } from "react";
 import { ValForm, ValFormAsync } from "../../types";
 import { ControlForm, ControlView } from "./controlView";
 
@@ -8,15 +8,6 @@ interface FormContext<T = any> {
   onChange:
     | (<Key extends keyof T>(field: Key, value: T[Key]) => void)
     | undefined;
-}
-
-interface FormManager<T> {
-  Form: <TProps extends { [k: string]: any }>(
-    props: PropsWithChildren<FormProps<T, TProps>>
-  ) => JSX.Element;
-  Field: <TProps extends { [k: string]: any }>(
-    props: FieldProps<TProps, T>
-  ) => JSX.Element;
 }
 
 export type FormProps<T, TProps extends { [k: string]: any }> = {

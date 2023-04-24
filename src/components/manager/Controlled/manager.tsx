@@ -1,5 +1,5 @@
-import { EventHandler } from "common/classes/EventHandler";
-import { ValueHandler } from "common/classes/ValueHandler";
+import { EventHandler } from "../../../common/classes/EventHandler";
+import { ValueHandler } from "../../../common/classes/ValueHandler";
 import React, { PureComponent } from "react";
 
 export type Status = "mounted" | "unmounted";

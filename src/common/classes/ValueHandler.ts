@@ -2,7 +2,7 @@ export abstract class BaseHandler<T> {
   abstract value: T;
 
   getDeepCopy() {
-    return structuredClone(this.value) as T;
+    return JSON.parse(JSON.stringify(this.value)) as T;
   }
 }
 

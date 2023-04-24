@@ -21,14 +21,19 @@ export default function useValueHandler<IValue>(
     new ValueHandler(initial instanceof Function ? initial() : initial)
   ).current;
 
-  const get = () => value.get() as IValue;
+  const get = useCallback(() => value.get() as IValue, []);
 
-  const set = (newValue: ValueSetter<IValue>, cb?: (value: IValue) => void) => {
-    const final =
-      newValue instanceof Function ? newValue(value.get() as IValue) : newValue;
-    value.set(final);
-    if (cb) cb(final);
-  };
+  const set = useCallback(
+    (newValue: ValueSetter<IValue>, cb?: (value: IValue) => void) => {
+      const final =
+        newValue instanceof Function
+          ? newValue(value.get() as IValue)
+          : newValue;
+      value.set(final);
+      if (cb) cb(final);
+    },
+    []
+  );
 
   const getDeepCopy = useCallback(() => value.getDeepCopy() as IValue, []);
 

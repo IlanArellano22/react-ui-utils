@@ -6,7 +6,7 @@ import {
 } from "./manager";
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
-} from "components/uncontrolled";
+} from "../../uncontrolled";
 
 type Register = (entry: ComponentRegister) => void;
 type ChangeStatus = (key: string, status: Status) => void;

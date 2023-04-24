@@ -1,5 +1,9 @@
-import React from "react";
-import { createContext, Dispatch, PropsWithChildren, useReducer } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  PropsWithChildren,
+  useReducer,
+} from "react";
 import {
   AppCacheAction,
   CacheEntry,
@@ -9,7 +13,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   ResourceCacheAction,
-} from "types/Cache";
+} from "../../types/Cache";
 
 interface CacheContextProps {
   getState: () => CacheState;

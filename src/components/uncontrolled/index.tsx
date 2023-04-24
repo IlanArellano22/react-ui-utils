@@ -6,7 +6,7 @@ import React, {
   ValidationMap,
   WeakValidationMap,
 } from "react";
-import { ParametersWithoutFistParam } from "types";
+import { ParametersWithoutFistParam } from "../../types";
 
 interface CustomComponentClass<
   IComponent extends Component,

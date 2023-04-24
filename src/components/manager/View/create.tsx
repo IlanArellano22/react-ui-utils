@@ -9,7 +9,7 @@ import {
 import { ViewProps } from "./comp";
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
-} from "components/uncontrolled";
+} from "../../uncontrolled";
 
 export interface ViewManager
   extends UncontrolledComponent<ViewManagerComponentProps> {

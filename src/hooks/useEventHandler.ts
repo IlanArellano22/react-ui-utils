@@ -1,4 +1,4 @@
-import { EventHandler } from "common/classes/EventHandler";
+import { EventHandler } from "../common/classes/EventHandler";
 import { useRef } from "react";
 
 const getId = (event: string) => `_${event}`;

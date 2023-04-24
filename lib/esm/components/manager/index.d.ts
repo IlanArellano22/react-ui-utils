@@ -1,2 +1,3 @@
-import { createViewManager } from "./Viewer";
-export { createViewManager };
+import { ViewManager } from "./View";
+import { createMountHandlerComponent } from "./Controlled";
+export { ViewManager, createMountHandlerComponent };

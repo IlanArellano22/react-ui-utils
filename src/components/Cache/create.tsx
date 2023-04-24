@@ -1,5 +1,5 @@
-import createUncontrolledClassComponent from "components/uncontrolled";
-import { CacheConfig, NamedResource, Resource } from "types/Cache";
+import createUncontrolledClassComponent from "../uncontrolled";
+import { CacheConfig, NamedResource, Resource } from "../../types/Cache";
 import { ResourceComponentManager } from "./manager";
 
 const cacheResource = <T extends Resource<string>, TName extends string>(

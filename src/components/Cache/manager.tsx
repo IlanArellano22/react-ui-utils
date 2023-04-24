@@ -4,11 +4,12 @@ import {
   NamedResource,
   Resource,
   ResourceCacheAction,
-} from "types/Cache";
+} from "../../types/Cache";
 import { CacheContext } from "./context";
 import { cacheResourceFuncs } from "./logic";
 
 export class ResourceComponentManager extends PureComponent<any> {
+  // @ts-ignore: Unreachable code error
   static contextType = CacheContext;
   context!: ContextType<typeof CacheContext>;
   constructor(props: any) {

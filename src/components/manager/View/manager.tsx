@@ -6,7 +6,7 @@ import {
   ViewMainComponent,
 } from "./comp";
 import { register } from "../Controlled/create";
-import { Sleep } from "common";
+import { Sleep } from "../../../common";
 
 export interface ShowFunc {
   <TResult>(
