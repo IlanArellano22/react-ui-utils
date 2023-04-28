@@ -1,7 +1,7 @@
 import { BaseHandler } from "../common/classes/ValueHandler";
-declare type Value<IValue> = IValue | (() => IValue);
-declare type ValueSetter<IValue> = IValue | ((prev: IValue) => IValue);
-declare type ValueHandlerResult<IValue> = [
+type Value<IValue> = IValue | (() => IValue);
+type ValueSetter<IValue> = IValue | ((prev: IValue) => IValue);
+type ValueHandlerResult<IValue> = [
     () => IValue,
     (value: ValueSetter<IValue>, cb?: (newValue: IValue) => void) => void,
     Omit<BaseHandler<IValue>, "value">

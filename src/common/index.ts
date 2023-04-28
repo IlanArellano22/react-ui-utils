@@ -28,3 +28,9 @@ export function mapObject<T, TOut>(
 export function isPromiseLike(x: any): x is PromiseLike<any> {
   return x && typeof (x as PromiseLike<any>).then === "function";
 }
+
+export const isClientSide = () =>
+  typeof window !== "undefined" && !!window.document;
+
+export const isDebug = () =>
+  typeof process !== "undefined" && process.env.NODE_ENV === "development";

@@ -15,8 +15,7 @@ export interface ViewManager
   extends UncontrolledComponent<ViewManagerComponentProps> {
   show: ShowFunc;
   showSync: ShowFuncSync;
-  removeAllEntries: () => void;
-  removeSomeEntries: (condition: ConditionView) => void;
+  removeEntries: (condition?: ConditionView) => void;
 }
 
 /**Metodo que genera un compomponente que sirve para renderizar un arreglo de componentes dentro de su propio estado
@@ -45,10 +44,7 @@ export const ViewManager: ViewManager = createUncontrolledClassComponent(
     ) => {
       return instance.showSync(render, props, context);
     },
-    removeAllEntries: (instance) => {
-      instance.removeAllEntries();
-    },
-    removeSomeEntries: (instance, condition: ConditionView) => {
+    removeEntries: (instance, condition?: ConditionView) => {
       instance.removeSomeEntries(condition);
     },
   }

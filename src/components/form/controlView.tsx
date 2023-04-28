@@ -1,5 +1,7 @@
-import React, { forwardRef } from "react";
-import { omit } from "../../common";
+import { Log } from "../../common/log";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import { isClientSide, omit } from "../../common";
+import { Form, Input } from "./FormComp";
 import type { FieldProps, FormProps } from "./index";
 
 export const ControlView = forwardRef<
@@ -7,13 +9,10 @@ export const ControlView = forwardRef<
   FieldProps<{ [k: string]: any }, any>
 >((props) => {
   const Component = props.render;
-  if (!Component)
-    throw new Error(
-      `El field para la props ${String(
-        props.field
-      )} no se ha asignado un render para que pueda pintarse`
-    );
-  const CompProps = omit(props, "field", "render", "value", "onChange");
+  const CompProps = useMemo(
+    () => omit(props, "field", "render", "value", "onChange"),
+    [props]
+  );
   const value = (props.value as any)?.[props.field];
 
   const handleChange = (ev: any) => {
@@ -21,9 +20,12 @@ export const ControlView = forwardRef<
     props.onChange(props.field, value);
   };
 
-  return (
-    <Component {...CompProps} key={2} value={value} onChange={handleChange} />
-  );
+  if (!Component) {
+    if (!isClientSide()) return null;
+    return <Input {...CompProps} value={value} onChange={handleChange} />;
+  }
+
+  return <Component {...CompProps} value={value} onChange={handleChange} />;
 });
 
 export const ControlForm = forwardRef<
@@ -31,13 +33,27 @@ export const ControlForm = forwardRef<
   FormProps<any, { [k: string]: any }>
 >((props, ref) => {
   const Component = props.render;
-  const CompProps = omit(props, "field", "render", "value", "onChange");
+  const [update, setUpdate] = useState<boolean>(false);
+  const CompProps = useMemo(
+    () => omit(props, "field", "render", "value", "onChange"),
+    [props]
+  );
+
+  useEffect(() => {
+    if (!Component) Log.debug.warn("sdas");
+    setUpdate(true);
+  }, []);
 
   const handleSubmit = (ev: any) => {
+    console.log({ internalValue: props.value });
     if (ev.preventDefault) ev.preventDefault();
     if (props.onSubmit) props.onSubmit(props.value);
   };
 
-  if (!Component) return <>{props.children}</>;
+  if (update === false) return null;
+  if (!Component) {
+    if (isClientSide()) return <Form {...CompProps} onSubmit={handleSubmit} />;
+    return <>{props.children}</>;
+  }
   return <Component ref={ref} {...CompProps} onSubmit={handleSubmit} />;
 });

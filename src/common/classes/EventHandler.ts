@@ -2,6 +2,8 @@ type Callback<IValue> = ((value?: IValue) => void) | undefined;
 
 let TOAST_ID = 0;
 
+export const getEventId = (event: string) => `_${event}`;
+
 interface EventsList<IValue> {
   id: string;
   callback: Callback<IValue>;

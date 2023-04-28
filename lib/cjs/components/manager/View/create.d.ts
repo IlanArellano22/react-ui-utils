@@ -3,8 +3,7 @@ import { UncontrolledComponent } from "../../uncontrolled";
 export interface ViewManager extends UncontrolledComponent<ViewManagerComponentProps> {
     show: ShowFunc;
     showSync: ShowFuncSync;
-    removeAllEntries: () => void;
-    removeSomeEntries: (condition: ConditionView) => void;
+    removeEntries: (condition?: ConditionView) => void;
 }
 /**Metodo que genera un compomponente que sirve para renderizar un arreglo de componentes dentro de su propio estado
  * el componente llama al metodo asincrono @see `show` para agregar un nuevo objeto que recive como parametros el

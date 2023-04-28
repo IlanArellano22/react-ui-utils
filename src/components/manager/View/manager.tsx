@@ -182,18 +182,11 @@ export class ViewManagerComponent extends React.PureComponent<
     }
   };
 
-  removeAllEntries = () => {
-    this.removeAll();
-  };
-
-  private removeAll = () => {
+  removeSomeEntries = (condition?: ConditionView) => {
     if (this.state.views.length === 0) return;
-    this.setState(() => ({ views: [] }));
-  };
-
-  removeSomeEntries = (condition: ConditionView) => {
-    if (this.state.views.length === 0) return;
-    this.setState((prev) => ({ views: prev.views.filter(condition) }));
+    this.setState((prev) => ({
+      views: !condition ? [] : prev.views.filter(condition),
+    }));
   };
 
   private addEntry = (entry: Entry) => {

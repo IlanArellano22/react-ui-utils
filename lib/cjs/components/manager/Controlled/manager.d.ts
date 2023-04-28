@@ -1,6 +1,6 @@
 import { EventHandler } from "../../../common/classes/EventHandler";
 import { PureComponent } from "react";
-export declare type Status = "mounted" | "unmounted";
+export type Status = "mounted" | "unmounted";
 export interface ComponentRegister {
     key: string;
     status: Status;

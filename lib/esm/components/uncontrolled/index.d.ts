@@ -9,13 +9,13 @@ interface CustomComponentClass<IComponent extends Component, P, S = ComponentSta
     defaultProps?: Partial<P> | undefined;
     displayName?: string | undefined;
 }
-declare type MethodsWithInstance<IComponent> = {
+type MethodsWithInstance<IComponent> = {
     [key: string]: (instance: IComponent, ...agrs: any[]) => any;
 };
-declare type Methods<IComponent, IMethodInstance extends MethodsWithInstance<IComponent>> = {
+type Methods<IComponent, IMethodInstance extends MethodsWithInstance<IComponent>> = {
     [key in keyof IMethodInstance]: (...args: ParametersWithoutFistParam<IMethodInstance[key]>) => ReturnType<IMethodInstance[key]>;
 };
-export declare type UncontrolledComponent<P> = {
+export type UncontrolledComponent<P> = {
     Component: (props: P) => JSX.Element;
     isInstanceMounted: () => boolean;
 };

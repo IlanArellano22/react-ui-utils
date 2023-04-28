@@ -1,6 +1,6 @@
-export declare type CacheActions = "cache" | "clear";
-export declare type JSONValue = string | number | boolean | {} | any[] | null | undefined;
-export declare type CachePayload = JSONValue | PromiseLike<JSONValue>;
+export type CacheActions = "cache" | "clear";
+export type JSONValue = string | number | boolean | {} | any[] | null | undefined;
+export type CachePayload = JSONValue | PromiseLike<JSONValue>;
 export interface CacheValue {
     payload: CachePayload;
     async: boolean;
@@ -19,16 +19,16 @@ export interface FunctionCache {
     entries: CacheEntry[];
     error?: Error;
 }
-export declare type CacheResource<T> = {
+export type CacheResource<T> = {
     [key in keyof T]: FunctionCache;
 };
-export declare type CacheState = {
+export type CacheState = {
     [key: string]: {
         cache: CacheResource<any>;
         depends: string[];
     } | undefined;
 };
-export declare type AppCacheAction = {
+export type AppCacheAction = {
     type: "clear";
 } | {
     type: "resource";
@@ -44,7 +44,7 @@ export declare type AppCacheAction = {
         resource: string;
     };
 };
-export declare type ResourceCacheAction<TKeys extends string> = {
+export type ResourceCacheAction<TKeys extends string> = {
     type: "clear";
     payload: {
         config: CacheConfig<TKeys>;
@@ -56,7 +56,7 @@ export declare type ResourceCacheAction<TKeys extends string> = {
         action: FunctionCacheAction;
     };
 };
-export declare type FunctionCacheAction = {
+export type FunctionCacheAction = {
     type: "setEntry";
     payload: {
         entry: CacheEntry;
@@ -81,10 +81,10 @@ export interface CacheResourceConfig {
     maxSize: number;
 }
 /**Un objeto de funciones */
-export declare type Resource<TKeys extends string> = {
+export type Resource<TKeys extends string> = {
     [K in TKeys]: (...args: any[]) => any;
 };
-export declare type NamedResource<T extends Resource<string>, TName extends string> = {
+export type NamedResource<T extends Resource<string>, TName extends string> = {
     /**Nombre del resource */
     name: TName;
     /**Nombre de los resources que se deben de limpiar al invalidar este resourceks*/
@@ -94,4 +94,4 @@ export declare type NamedResource<T extends Resource<string>, TName extends stri
         [K in keyof T]: T[K];
     };
 };
-export declare type CacheResourceFunc = <T extends Resource<string>, TName extends string>(name: TName, resource: T, resourceConf: CacheConfig<Extract<keyof T, string>>) => NamedResource<T, TName>;
+export type CacheResourceFunc = <T extends Resource<string>, TName extends string>(name: TName, resource: T, resourceConf: CacheConfig<Extract<keyof T, string>>) => NamedResource<T, TName>;

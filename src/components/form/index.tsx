@@ -1,6 +1,14 @@
-import React, { createContext, PureComponent } from "react";
+import React, {
+  createContext,
+  PureComponent,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { ItemManager } from "../../types/validation";
 import { ValForm, ValFormAsync } from "../../types";
 import { ControlForm, ControlView } from "./controlView";
+import { EventHandler, getEventId } from "../../common/classes/EventHandler";
 
 interface FormContext<T = any> {
   value: T | undefined;
@@ -8,10 +16,11 @@ interface FormContext<T = any> {
   onChange:
     | (<Key extends keyof T>(field: Key, value: T[Key]) => void)
     | undefined;
+  itemManager: ItemManager<T, "change">;
 }
 
 export type FormProps<T, TProps extends { [k: string]: any }> = {
-  render: React.ComponentType<TProps>;
+  render?: React.ComponentType<TProps>;
   ref?: React.Ref<any>;
   onSubmit?: (result: T) => void;
 } & (Partial<Pick<TProps, "value">> &
@@ -20,7 +29,7 @@ export type FormProps<T, TProps extends { [k: string]: any }> = {
   });
 
 export type FieldProps<TProps extends { [k: string]: any }, T> = {
-  render: React.ComponentType<TProps>;
+  render?: React.ComponentType<TProps>;
   field: keyof T;
   ref?: React.Ref<any>;
 } & (Partial<Pick<TProps, "value">> &
@@ -28,29 +37,59 @@ export type FieldProps<TProps extends { [k: string]: any }, T> = {
     onChange?: TProps["onChange"] | null;
   });
 
+type Events = "change";
+
+const initialFormCtx: FormContext = {
+  value: undefined,
+  itemManager: {
+    addEventListenner: () => {},
+    removeEventListenner: () => {},
+  },
+  onChange: undefined,
+  validation: {},
+};
+
 export function createFormManager<T>(initial: T) {
-  const FormCxt = createContext<FormContext>(
-    undefined as unknown as FormContext<T>
+  const FormCxt = createContext<FormContext<T>>(
+    initialFormCtx as FormContext<T>
   );
 
   class Form<TProps extends { [k: string]: any }> extends PureComponent<
-    TProps,
+    FormProps<T, TProps>,
     { value: T }
   > {
-    constructor(props: TProps) {
+    private event: EventHandler<T>;
+    constructor(props: FormProps<T, TProps>) {
       super(props);
       this.state = {
         value: initial,
       };
+      this.event = new EventHandler<T>();
     }
 
     handleChange = <Key extends keyof T>(field: Key, value: T[Key]) => {
       console.log("change", field, value);
-      this.setState((prev) => ({ ...prev, [field]: value }));
+      const newValue = { ...this.state.value, [field]: value };
+      this.setState(() => ({ value: newValue }));
+      const id = getEventId("change");
+      this.event.setSelectedId(id);
+      this.event.listen(newValue);
     };
+
+    addEventListenner(event: Events, fn: (value: T) => void) {
+      const id = getEventId(event);
+      this.event.setSelectedId(id);
+      this.event.suscribe((value) => fn(value as T), id);
+    }
+
+    removeEventListenner(event: Events) {
+      const id = getEventId(event);
+      this.event.clear(id);
+    }
 
     render() {
       const { value } = this.state;
+      console.log({ formValue: value });
       return (
         <FormCxt.Provider
           value={{
@@ -58,9 +97,13 @@ export function createFormManager<T>(initial: T) {
             // @ts-ignore: Unreachable code error
             onChange: this.handleChange.bind(this),
             validation: {},
+            itemManager: {
+              addEventListenner: this.addEventListenner.bind(this),
+              removeEventListenner: this.removeEventListenner.bind(this),
+            },
           }}
         >
-          <ControlForm {...this.props} />
+          <ControlForm {...this.props} value={value} />
         </FormCxt.Provider>
       );
     }
@@ -84,7 +127,7 @@ export function createFormManager<T>(initial: T) {
           return (
             <ControlView
               {...props}
-              value={formctx.value[props.field]}
+              value={formctx.value?.[props.field]}
               onChange={!isDisabled && handleChange}
               disabled={isDisabled}
             />
@@ -94,5 +137,22 @@ export function createFormManager<T>(initial: T) {
     );
   }
 
-  return { Field, Form };
+  function useFormValue() {
+    const { value: FormValue, itemManager } = useContext(FormCxt);
+    const [value, setValue] = useState(() => FormValue);
+
+    useEffect(() => {
+      itemManager.addEventListenner("change", (newValue) => {
+        setValue(newValue);
+      });
+
+      return () => {
+        itemManager.removeEventListenner("change");
+      };
+    }, []);
+
+    return { value };
+  }
+
+  return { Field, Form, useFormValue };
 }
