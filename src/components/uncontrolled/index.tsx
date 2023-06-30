@@ -1,5 +1,5 @@
-import React, {
-  Component,
+import {
+  Component as ReactComponent,
   ComponentState,
   Context,
   StaticLifecycle,
@@ -9,7 +9,7 @@ import React, {
 import { ParametersWithoutFistParam } from "../../types";
 
 interface CustomComponentClass<
-  IComponent extends Component,
+  IComponent extends ReactComponent,
   P,
   S = ComponentState
 > extends StaticLifecycle<P, S> {
@@ -23,7 +23,7 @@ interface CustomComponentClass<
 }
 
 type MethodsWithInstance<IComponent> = {
-  [key: string]: (instance: IComponent, ...agrs: any[]) => any;
+  [key: string]: (instance: () => IComponent, ...agrs: any[]) => any;
 };
 type Methods<
   IComponent,
@@ -34,22 +34,84 @@ type Methods<
   ) => ReturnType<IMethodInstance[key]>;
 };
 
-export type UncontrolledComponent<P> = {
+export type UncontrolledComponent<P = {}> = {
   Component: (props: P) => JSX.Element;
   isInstanceMounted: () => boolean;
 };
 
-/**Genera una React Class Component cuyos methodos pueden ser manipulados por otros componentes sin necesidad de estar controlado por props */
+interface Options {
+  strictMode: boolean;
+}
+
+const isClassComponent = (component: any) =>
+  typeof component === "function" && !!component.prototype.isReactComponent;
+
+/**Provides a React Class Component that internal methods can be malipulated by other React component throught their own instance
+ * 
+ * @param {IComponent} Comp
+ * @param {IMethods} methods
+ * @param {Options} options
+ * 
+ * ```tsx
+ * import { Component } from "react";
+*import {createUncontrolledClassComponent} from "@ihaz/react-ui-utils";
+*
+*class ExampleClassComponent extends Component<any, {selector: number}> {
+ *   constructor(props: any) {
+  *      super(props);
+   *     this.state = {
+   *         selector: 1
+   *     }
+   * }
+*
+ *   getSelector = () => this.state.selector;
+ *   changeSelector = (new_selector: number) => this.setState({ selector: new_selector });
+*
+ *   render() {
+  *      return ... //JSX
+   * }
+*}
+*
+*
+*const UncontrolledExample = createUncontrolledClassComponent(ExampleClassComponent, {
+ *   getSelector: (instance) => instance().getSelector(),
+ * changeSelector: (instance, new_selector: number) => instance().changeSelector(new_selector),
+*});
+*
+*
+*export const Main = () => {
+*
+ *   const show = () => {
+  *      console.log(UncontrolledExample.getSelector()) // 1
+   * }
+   *   const changeSelector = () => {
+  *  UncontrolledExample.changeSelector(2); //Changes internal selector state to 2
+  * };
+*
+ *   return <>
+  *  <UncontrolledExample.Component />
+   * <button onClick={show}>Show Selector</button>
+   * <button onClick={changeSelector}>Change Selector</button>
+   * </>
+*}
+```
+ */
 export default function createUncontrolledClassComponent<
-  IComponent extends Component<P, S>,
+  IComponent extends ReactComponent<P, S>,
   IMethods extends MethodsWithInstance<IComponent>,
   P = {},
   S = ComponentState
 >(
   Comp: CustomComponentClass<IComponent, P, S>,
-  methods: IMethods
+  methods: IMethods,
+  options?: Partial<Options>
 ): Methods<IComponent, IMethods> & UncontrolledComponent<P> {
+  if (!isClassComponent(Comp))
+    throw new Error("This Method only allows class components.");
+
   let instance: IComponent | null = null;
+
+  const getInstance = () => instance;
 
   const handleRef = (x: IComponent | null) => {
     instance = x;
@@ -65,8 +127,9 @@ export default function createUncontrolledClassComponent<
     Object.entries(methods).map((method) => {
       const [k, func] = method;
       const newFunc = (...args: ParametersWithoutFistParam<typeof func>) => {
-        if (!instance) throw Error("El componente aun no ha sido inicializado");
-        return func(instance, ...args);
+        if (!instance && (options?.strictMode ?? true))
+          throw Error("El componente aun no ha sido inicializado");
+        return func(getInstance as () => IComponent, ...args);
       };
       return [k, newFunc];
     })

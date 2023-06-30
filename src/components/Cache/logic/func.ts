@@ -1,4 +1,4 @@
-import { isPromiseLike } from "common";
+import { deepEqual, isPromiseLike } from "../../../common";
 import {
   CacheEntry,
   CachePayload,
@@ -6,7 +6,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
-} from "types/Cache";
+} from "../../../types/Cache";
 
 function syncCacheCall(
   cache: FunctionCache,
@@ -20,7 +20,8 @@ function syncCacheCall(
   /**Indica si la función devolvió una promesa */
   async: boolean;
 } {
-  const entry = cache.entries.find((entry) => entry.args === args);
+  console.log({ args, entries: cache.entries });
+  const entry = cache.entries.find((entry) => deepEqual(entry.args, args));
   const value = entry ? entry.value.payload : func(...args);
 
   const cached = !!entry;

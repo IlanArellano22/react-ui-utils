@@ -1,7 +1,6 @@
 import {
   ViewManager,
   createFormManager,
-  createMountHandlerComponent,
   createUncontrolledClassComponent,
 } from "./components";
 import { Sleep, omit } from "./common";
@@ -15,7 +14,6 @@ import {
 export {
   ViewManager,
   createFormManager,
-  createMountHandlerComponent,
   createUncontrolledClassComponent,
   Sleep,
   omit,

@@ -1,4 +1,4 @@
-import { mapObject } from "common";
+import { mapObject } from "../../../common";
 import {
   CacheConfig,
   CacheResource,
@@ -6,7 +6,7 @@ import {
   FunctionCacheAction,
   Resource,
   ResourceCacheAction,
-} from "types/Cache";
+} from "../../../types/Cache";
 import { emptyFunctionCache } from "../context";
 import { cacheCall } from "./func";
 
@@ -50,6 +50,8 @@ export function cacheResourceFuncs<T extends Resource<string>>(
     };
 
     const cache = get();
+
+    console.log({ cacheGet: cache });
 
     //Si no se ocupa usar el cache se realiza la llamada igual pero con un emptyCache y un fDispatch que no hace nada
     const fCache = ((usarCache && cache[key]) || emptyFunctionCache)!;

@@ -1,5 +1,5 @@
+import { useImperativeHandle, useRef } from "react";
 import { EventHandler } from "../common/classes/EventHandler";
-import { useRef } from "react";
 
 const getId = (event: string) => `_${event}`;
 
@@ -8,31 +8,33 @@ export default function useEventHandler<
   IEvents extends string,
   IValue = any
 >() {
-  const eventHandler = useRef(new EventHandler<IValue>()).current;
+  const eventHandler = useRef<EventHandler<IValue> | null>(null);
+
+  useImperativeHandle(eventHandler, () => new EventHandler<IValue>(), []);
 
   const addEventListenner = (event: IEvents, fn: (value: IValue) => void) => {
     const id = getId(event);
-    if (eventHandler.isSuscribed(id)) return;
-    eventHandler.suscribe((value) => fn(value as IValue), id);
+    if (eventHandler.current?.isSuscribed(id)) return;
+    eventHandler.current?.suscribe((value) => fn(value as IValue), id);
   };
 
   const removeEventListenner = (event: IEvents) => {
     const id = getId(event);
-    eventHandler.clear(id);
+    eventHandler.current?.clear(id);
   };
 
   const listen = (event: IEvents, value: IValue) => {
     const id = getId(event);
-    eventHandler.setSelectedId(id);
-    eventHandler.listen(value);
+    eventHandler.current?.setSelectedId(id);
+    eventHandler.current?.listen(value);
   };
 
   const listenAll = () => {
-    eventHandler.listenAll();
+    eventHandler.current?.listenAll();
   };
 
   const clearAll = () => {
-    eventHandler.clearAll();
+    eventHandler.current?.clearAll();
   };
 
   return {

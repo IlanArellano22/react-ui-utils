@@ -5,13 +5,13 @@ import {
   Resource,
   ResourceCacheAction,
 } from "../../types/Cache";
-import { CacheContext } from "./context";
+import { CacheContext, getState } from "./context";
 import { cacheResourceFuncs } from "./logic";
 
 export class ResourceComponentManager extends PureComponent<any> {
   // @ts-ignore: Unreachable code error
   static contextType = CacheContext;
-  context!: ContextType<typeof CacheContext>;
+  declare context: ContextType<typeof CacheContext>;
   constructor(props: any) {
     super(props);
   }
@@ -21,8 +21,12 @@ export class ResourceComponentManager extends PureComponent<any> {
     resource: T,
     resourceConf: CacheConfig<Extract<keyof T, string>>
   ): NamedResource<T, TName> => {
-    const { getState, dispatch } = this.context;
-    const getResource = () => getState()[name]?.cache || {};
+    const { dispatch } = this.context;
+    const getResource = () => {
+      const state = getState();
+      console.log({ getState: state });
+      return state[name]?.cache || {};
+    };
     const depends = resourceConf.depends || [];
     const dispatchResource = (ac: ResourceCacheAction<string>) => {
       if (ac.type == "clear") {
@@ -61,6 +65,6 @@ export class ResourceComponentManager extends PureComponent<any> {
   };
 
   render() {
-    return <></>;
+    return null;
   }
 }

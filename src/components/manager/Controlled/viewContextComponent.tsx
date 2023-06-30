@@ -4,7 +4,7 @@ import { register } from "./create";
 /**Registra un componente dentro de una coleccion donde se controla es estado de dicho componente, asignandole a un EventHandler
  * donde se pueden suscribir varios eventos
  */
-export function createMountHandlerComponent<T extends JSX.IntrinsicAttributes>(
+export function createViewContextComponent<T extends JSX.IntrinsicAttributes>(
   ComponentWithRef: ComponentType<T>,
   key: string
 ): ComponentType<T> {

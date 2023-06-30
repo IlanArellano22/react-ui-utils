@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PureComponent } from "react";
 import {
   type ViewComponentProps,
   type Entry,
@@ -7,10 +7,11 @@ import {
 } from "./comp";
 import { register } from "../Controlled/create";
 import { Sleep } from "../../../common";
-
+import { EventHandlerRegister } from "../Controlled/manager";
 export interface ShowFunc {
   <TResult>(
     render: React.ComponentType<ViewProps<TResult>>,
+    props?: {},
     context?: string
   ): Promise<TResult>;
   <TProps>(
@@ -20,53 +21,46 @@ export interface ShowFunc {
   ): Promise<TProps extends ViewProps<infer TResult> ? TResult : unknown>;
 }
 
-export type ShowToastFunc<TProps> = (
-  render: React.ComponentType<TProps>,
-  props?: Omit<TProps, keyof ViewProps<any>>
-) => void;
-
 export interface ViewSyncStartOptions {
   delay: number;
 }
 
-export interface ViewSyncResult<IResult> {
+export interface ViewSyncResult {
   start: (options?: Partial<ViewSyncStartOptions>) => void;
   /**Cierra el modal instanciado, devolviendo el resultado que previamente
    * fue seteado con la llamada @see `onClose` en caso de no ser llamado
    * devolvera undefined, si el modal fue previamente cerrado la funcion no
    * tendrá efecto
    */
-  close: () => IResult;
+  close: () => void;
 }
 
 export interface ShowFuncSync {
   <TResult>(
     render: React.ComponentType<ViewProps<TResult>>,
+    props?: {},
+    onCloseListenner?: (res: TResult) => void,
     context?: string
-  ): ViewSyncResult<TResult>;
+  ): ViewSyncResult;
   <TProps>(
     render: React.ComponentType<TProps>,
     props?: Omit<TProps, keyof ViewProps<any>>,
+    onCloseListenner?: (
+      res: TProps extends ViewProps<infer IResult> ? IResult : unknown
+    ) => void,
     context?: string
-  ): TProps extends ViewProps<infer TResult>
-    ? ViewSyncResult<TResult>
-    : ViewSyncResult<unknown>;
+  ): ViewSyncResult;
 }
 
 export type ConditionView = (x: Entry) => boolean;
 
-export interface ViewManagerComponentProps {
-  context?: boolean;
-}
+let INTANCE_NUMBER = 0;
 
-let VIEW_CONTEXT_ID = 0;
-let VIEW_CONTEXT_ID_SYNC = 0;
-
-export class ViewManagerComponent extends React.PureComponent<
-  ViewManagerComponentProps,
+export class ViewManagerComponent extends PureComponent<
+  {},
   ViewComponentProps
 > {
-  constructor(props: ViewManagerComponentProps) {
+  constructor(props: {}) {
     super(props);
     this.state = {
       views: [],
@@ -86,7 +80,14 @@ export class ViewManagerComponent extends React.PureComponent<
         id: currId,
         render: render,
         props: {
-          onClose: this.handleClose(currId, resolve),
+          onClose: (result: any) => {
+            this.handleClose(currId, resolve)(result);
+            let handler: EventHandlerRegister | undefined;
+            if (context && (handler = register.getComponentHandler(context))) {
+              const context_id = `${context}_${entry.id}`;
+              handler.event.clear(context_id);
+            }
+          },
           ...(props || {}),
         },
       };
@@ -98,10 +99,10 @@ export class ViewManagerComponent extends React.PureComponent<
   showSync = (
     render: React.ComponentType<ViewProps>,
     props: {},
+    onCloseListenner?: (res: any) => void,
     context?: string
-  ): ViewSyncResult<any> => {
+  ): ViewSyncResult => {
     const currId = this.state.nextId;
-    let result: any;
 
     const entry: Entry = {
       id: currId,
@@ -109,19 +110,26 @@ export class ViewManagerComponent extends React.PureComponent<
       props: {
         ...(props || {}),
         onClose: (res) => {
-          result = res;
+          this.handleCloseSync(currId);
+          let handler: EventHandlerRegister | undefined;
+          if (context && (handler = register.getComponentHandler(context))) {
+            const context_id = `${context}_${entry.id}`;
+            handler.event.clear(context_id);
+          }
+          if (onCloseListenner) onCloseListenner(res);
         },
       },
     };
 
     return {
       start: (options) => {
-        if (!options?.delay) return this.startModalSync(entry, result, context);
-        Sleep(options.delay).then(() =>
-          this.startModalSync(entry, result, context)
-        );
+        if (!options?.delay) return this.startModalSync(entry, context);
+        Sleep(options.delay).then(() => this.startModalSync(entry, context));
       },
-      close: this.handleCloseSync(entry.id, result),
+      close: () => {
+        this.handleCloseSync(entry.id);
+        if (onCloseListenner) onCloseListenner(undefined);
+      },
     };
   };
 
@@ -139,7 +147,7 @@ export class ViewManagerComponent extends React.PureComponent<
         handler
       ) {
         this.addEntry(entry);
-        const context_id = `${context}_${++VIEW_CONTEXT_ID}`;
+        const context_id = `${context}_${entry.id}`;
         handler.event.suscribe(() => {
           console.log("suscribe");
           this.handleClose(entry.id, resolve)(undefined);
@@ -156,7 +164,7 @@ export class ViewManagerComponent extends React.PureComponent<
     }
   };
 
-  private startModalSync = (entry: Entry, result?: any, context?: string) => {
+  private startModalSync = (entry: Entry, context?: string) => {
     if (context) {
       const componentDetails = register.getComponentDetails(context);
       const handler = register.getComponentHandler(context);
@@ -166,10 +174,10 @@ export class ViewManagerComponent extends React.PureComponent<
         handler
       ) {
         this.addEntry(entry);
-        const context_id = `${context}_sync_${++VIEW_CONTEXT_ID_SYNC}`;
+        const context_id = `${context}_sync_${entry.id}`;
         handler.event.suscribe(() => {
           console.log("suscribe");
-          this.handleCloseSync(entry.id, result)();
+          this.handleCloseSync(entry.id);
         }, context_id);
         handler.event.setSelectedId(context_id);
       } else {
@@ -209,19 +217,28 @@ export class ViewManagerComponent extends React.PureComponent<
       this.removeEntry(id);
     };
 
-  private handleCloseSync = (id: number, result: any) => () => {
+  private handleCloseSync = (id: number) => {
     this.removeEntry(id);
-    return result;
   };
 
-  render() {
-    if (this.props.context)
-      return (
-        <>
-          <register.Component />
-          <ViewMainComponent {...this.state} />
-        </>
+  componentDidMount() {
+    INTANCE_NUMBER += 1;
+    if (INTANCE_NUMBER > 1)
+      console.warn(
+        "Component View instance has been mounted more than once, it will be cause duplicated views."
       );
-    return <ViewMainComponent {...this.state} />;
+  }
+
+  componentWillUnmount() {
+    INTANCE_NUMBER = INTANCE_NUMBER - 1 < 0 ? 0 : INTANCE_NUMBER - 1;
+  }
+
+  render() {
+    return (
+      <>
+        <register.Component />
+        <ViewMainComponent {...this.state} />
+      </>
+    );
   }
 }

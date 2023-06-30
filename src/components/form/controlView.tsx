@@ -1,8 +1,9 @@
-import { Log } from "../../common/log";
 import React, { forwardRef, useEffect, useMemo, useState } from "react";
-import { isClientSide, omit } from "../../common";
+import { Log } from "../../common/log";
 import { Form, Input } from "./FormComp";
 import type { FieldProps, FormProps } from "./index";
+import { Client } from "../../common/namespaces/client";
+import { omit } from "../../common";
 
 export const ControlView = forwardRef<
   any,
@@ -21,7 +22,7 @@ export const ControlView = forwardRef<
   };
 
   if (!Component) {
-    if (!isClientSide()) return null;
+    if (!Client.isClientSide()) return null;
     return <Input {...CompProps} value={value} onChange={handleChange} />;
   }
 
@@ -39,21 +40,17 @@ export const ControlForm = forwardRef<
     [props]
   );
 
+  const isClient = useMemo(() => Client.isClientSide(), []);
+
   useEffect(() => {
     if (!Component) Log.debug.warn("sdas");
     setUpdate(true);
   }, []);
 
-  const handleSubmit = (ev: any) => {
-    console.log({ internalValue: props.value });
-    if (ev.preventDefault) ev.preventDefault();
-    if (props.onSubmit) props.onSubmit(props.value);
-  };
-
   if (update === false) return null;
   if (!Component) {
-    if (isClientSide()) return <Form {...CompProps} onSubmit={handleSubmit} />;
+    if (isClient) return <Form {...CompProps} />;
     return <>{props.children}</>;
   }
-  return <Component ref={ref} {...CompProps} onSubmit={handleSubmit} />;
+  return <Component ref={ref} {...CompProps} />;
 });

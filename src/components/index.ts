@@ -1,10 +1,5 @@
 import createUncontrolledClassComponent from "./uncontrolled";
-import { ViewManager, createMountHandlerComponent } from "./manager";
+import { ViewManager } from "./manager";
 import { createFormManager } from "./form";
 
-export {
-  ViewManager,
-  createMountHandlerComponent,
-  createUncontrolledClassComponent,
-  createFormManager,
-};
+export { ViewManager, createUncontrolledClassComponent, createFormManager };

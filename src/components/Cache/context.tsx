@@ -1,9 +1,5 @@
-import React, {
-  createContext,
-  Dispatch,
-  PropsWithChildren,
-  useReducer,
-} from "react";
+import { createContext, Dispatch, PropsWithChildren, useReducer } from "react";
+import { deepEqual } from "../../common";
 import {
   AppCacheAction,
   CacheEntry,
@@ -16,14 +12,12 @@ import {
 } from "../../types/Cache";
 
 interface CacheContextProps {
-  getState: () => CacheState;
   dispatch: Dispatch<AppCacheAction>;
 }
 
 const CACHE_INITIAL = {} as CacheState;
 
 const INITIAL_CACHE_CONTEXT: CacheContextProps = {
-  getState: () => CACHE_INITIAL,
   dispatch: () => {},
 };
 
@@ -41,15 +35,22 @@ export function setCacheEntry(
   config: CacheResourceConfig,
   entry: CacheEntry
 ): FunctionCache {
-  const index = cache.entries.findIndex((x) => x.args === entry.args);
+  const index = (cache.entries || []).findIndex((x) =>
+    deepEqual(x.args, entry.args)
+  );
   if (index !== -1) {
     return {
       entries: cache.entries.map((x, i) => (i === entry.id ? entry : x)),
     };
   }
 
+  const newEntries = [
+    entry,
+    ...(cache.entries || []).slice(0, config.maxSize - 1),
+  ];
+
   return {
-    entries: [entry, ...cache.entries.slice(0, config.maxSize - 1)],
+    entries: newEntries,
   };
 }
 
@@ -70,6 +71,7 @@ export function CacheFuncReducer(
   cache: FunctionCache,
   action: FunctionCacheAction
 ): FunctionCache {
+  console.log({ cache, action });
   switch (action.type) {
     case "clear":
       return emptyFunctionCache;
@@ -96,55 +98,66 @@ export function setExistingCacheEntryById(
   id: number,
   getNewEntry: (old: CacheEntry) => CacheEntry
 ): FunctionCache {
-  const index = cache.entries.findIndex((x) => x.id === id);
-  if (index === null || index === undefined) return cache;
+  const index = (cache.entries || []).findIndex((x) => x.id === id);
+  if (index === -1) return cache;
   return setExistingCacheEntryByIndex(cache, index, getNewEntry);
 }
 
 export const cacheReducer = <T,>(
-  cache: CacheResource<T>,
+  state: CacheResource<T>,
   action: ResourceCacheAction<Extract<keyof T, string>>
-) => {
+): CacheResource<T> => {
+  console.log({ cacheReducer: state, action: action.payload.func });
   switch (action.type) {
     case "clear":
-      return {};
+      return {} as CacheResource<T>;
     case "func":
+      console.log("func");
       return {
-        ...cache,
+        ...state,
         [action.payload.func]: CacheFuncReducer(
-          (cache[action.payload.func] || {})!,
+          (state[action.payload.func] || {})!,
           action.payload.action
         ),
       };
   }
 };
 
-const reducer = (state: CacheState, action: AppCacheAction): CacheState => {
+const reducer = (
+  stateCache: CacheState,
+  action: AppCacheAction
+): CacheState => {
   switch (action.type) {
     case "clearRec":
       return CACHE_INITIAL;
-    case "clearRec":
-      return state;
     case "resource":
       return {
-        ...state,
+        ...stateCache,
         [action.payload.resource]: {
-          cache: {},
+          cache: cacheReducer<any>(
+            stateCache[action.payload.resource]?.cache ||
+              ({} as CacheResource<{}>),
+            action.payload.action
+          ),
           depends: action.payload.depends,
         },
       };
     default:
-      return state;
+      return stateCache;
   }
 };
+
+let _store: CacheState;
+
+export const getState = () => _store;
 
 export const CacheResourceProvider = ({ children }: PropsWithChildren) => {
   const [state, dispatch] = useReducer(reducer, {} as CacheState);
 
-  const getState = () => state;
+  _store = state;
 
   return (
-    <CacheContext.Provider value={{ getState, dispatch }}>
+    <CacheContext.Provider value={{ dispatch }}>
       {children}
     </CacheContext.Provider>
   );

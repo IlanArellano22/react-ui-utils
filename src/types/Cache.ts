@@ -56,7 +56,7 @@ export type AppCacheAction =
         resource: string;
         /**Nombres de los resources que dependen de este resource */
         depends: string[];
-        action: ResourceCacheAction<any>;
+        action: ResourceCacheAction<string>;
       };
     }
   | {
