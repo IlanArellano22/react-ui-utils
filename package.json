@@ -1,6 +1,6 @@
 {
   "name": "@ihaz/react-ui-utils",
-  "version": "1.0.0",
+  "version": "1.0.0-beta",
   "description": "A general UI common methods for React Projects, supports React Dom and React Native.",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
