@@ -1,1 +1,0 @@
-export { createMountHandlerComponent } from "./createMountHandlerComponent";

@@ -42,7 +42,6 @@ export class RegisterComponentManager extends PureComponent<any, State> {
     const newState = [...this.state.components];
     newState[index] = entry;
     this.setState({ components: newState });
-    console.log("unmounted", { components: newState });
     if (entry.status === "unmounted" && this.componentMountEvents) {
       const MountRef = this.getComponentHandler(entry.key);
       if (MountRef) {
@@ -53,7 +52,6 @@ export class RegisterComponentManager extends PureComponent<any, State> {
   }
 
   public getComponentDetails(key: string) {
-    console.log({ key, components: this.state.components });
     return this.state.components.find((comp) => comp?.key === key);
   }
 
@@ -82,10 +80,6 @@ export class RegisterComponentManager extends PureComponent<any, State> {
         })
       );
     }
-    console.log({
-      entry,
-      events: this.componentMountEvents,
-    });
   }
 
   render() {

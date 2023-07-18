@@ -149,7 +149,6 @@ export class ViewManagerComponent extends PureComponent<
         this.addEntry(entry);
         const context_id = `${context}_${entry.id}`;
         handler.event.suscribe(() => {
-          console.log("suscribe");
           this.handleClose(entry.id, resolve)(undefined);
         }, context_id);
         handler.event.setSelectedId(context_id);
@@ -176,7 +175,6 @@ export class ViewManagerComponent extends PureComponent<
         this.addEntry(entry);
         const context_id = `${context}_sync_${entry.id}`;
         handler.event.suscribe(() => {
-          console.log("suscribe");
           this.handleCloseSync(entry.id);
         }, context_id);
         handler.event.setSelectedId(context_id);

@@ -20,7 +20,6 @@ function syncCacheCall(
   /**Indica si la función devolvió una promesa */
   async: boolean;
 } {
-  console.log({ args, entries: cache.entries });
   const entry = cache.entries.find((entry) => deepEqual(entry.args, args));
   const value = entry ? entry.value.payload : func(...args);
 

@@ -51,8 +51,6 @@ export function cacheResourceFuncs<T extends Resource<string>>(
 
     const cache = get();
 
-    console.log({ cacheGet: cache });
-
     //Si no se ocupa usar el cache se realiza la llamada igual pero con un emptyCache y un fDispatch que no hace nada
     const fCache = ((usarCache && cache[key]) || emptyFunctionCache)!;
     const fDispatch = getFuncCacheDispatch(dispatch, key as string, !usarCache);

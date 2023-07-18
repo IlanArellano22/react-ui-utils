@@ -1,4 +1,9 @@
-import { createContext, Dispatch, PropsWithChildren, useReducer } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  PropsWithChildren,
+  useReducer,
+} from "react";
 import { deepEqual } from "../../common";
 import {
   AppCacheAction,
@@ -71,7 +76,6 @@ export function CacheFuncReducer(
   cache: FunctionCache,
   action: FunctionCacheAction
 ): FunctionCache {
-  console.log({ cache, action });
   switch (action.type) {
     case "clear":
       return emptyFunctionCache;
@@ -107,12 +111,10 @@ export const cacheReducer = <T,>(
   state: CacheResource<T>,
   action: ResourceCacheAction<Extract<keyof T, string>>
 ): CacheResource<T> => {
-  console.log({ cacheReducer: state, action: action.payload.func });
   switch (action.type) {
     case "clear":
       return {} as CacheResource<T>;
     case "func":
-      console.log("func");
       return {
         ...state,
         [action.payload.func]: CacheFuncReducer(

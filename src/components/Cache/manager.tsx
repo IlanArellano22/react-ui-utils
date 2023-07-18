@@ -1,4 +1,4 @@
-import React, { ContextType, PureComponent } from "react";
+import { ContextType, PureComponent } from "react";
 import {
   CacheConfig,
   NamedResource,
@@ -24,7 +24,6 @@ export class ResourceComponentManager extends PureComponent<any> {
     const { dispatch } = this.context;
     const getResource = () => {
       const state = getState();
-      console.log({ getState: state });
       return state[name]?.cache || {};
     };
     const depends = resourceConf.depends || [];

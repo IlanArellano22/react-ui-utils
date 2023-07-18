@@ -24,7 +24,6 @@ export class EventHandler<IValue = any> {
     this.list.some((evt) => evt.id === (id ?? this.selectedId));
 
   listen(value?: IValue) {
-    console.log({ list: this.list, selectedId: this.selectedId });
     if (!this.list.length) return;
     if (!this.selectedId) {
       const lastEvent = this.list.pop();

@@ -1,4 +1,4 @@
-import { PureComponent, ReactNode } from "react";
+import React, { PureComponent, ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import createUncontrolledClassComponent from ".";
@@ -40,5 +40,15 @@ describe("render classComponentManager", () => {
     render(<manager.Component />);
 
     expect(screen.getByText(/Render/)).toBeInTheDocument();
+  });
+
+  it("should method getCounter return a number", () => {
+    render(<manager.Component />);
+
+    const getCounter = manager.getCounter();
+
+    setTimeout(() => {
+      expect(getCounter).toBe(0);
+    }, 500);
   });
 });
