@@ -5,11 +5,13 @@
     "baseUrl": "./src",
     "module": "esnext",
     "lib": ["dom", "esnext"],
+    "paths": {
+      "@ihaz/react-ui-utils": ["./src/index.ts"]
+    },
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
-    "rootDir": "./src",
-    "outDir": "./lib/esm",
+    "outDir": "lib",
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
