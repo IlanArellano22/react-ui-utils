@@ -16,7 +16,7 @@ import {
   ResourceCacheAction,
 } from "../../types/Cache";
 
-interface CacheContextProps {
+export interface CacheContextProps {
   dispatch: Dispatch<AppCacheAction>;
 }
 

@@ -1,16 +1,15 @@
-import { ContextType, PureComponent } from "react";
+import { ContextType, PureComponent, type Context } from "react";
 import {
   CacheConfig,
   NamedResource,
   Resource,
   ResourceCacheAction,
 } from "../../types/Cache";
-import { CacheContext, getState } from "./context";
+import { CacheContext, CacheContextProps, getState } from "./context";
 import { cacheResourceFuncs } from "./logic";
 
 export class ResourceComponentManager extends PureComponent<any> {
-  // @ts-ignore: Unreachable code error
-  static contextType = CacheContext;
+  static contextType: Context<CacheContextProps> = CacheContext;
   declare context: ContextType<typeof CacheContext>;
   constructor(props: any) {
     super(props);

@@ -1,6 +1,7 @@
 import React, {
   Component as ReactComponent,
   ComponentState,
+  ComponentType,
   Context,
   StaticLifecycle,
   ValidationMap,
@@ -35,7 +36,7 @@ type Methods<
 };
 
 export type UncontrolledComponent<P = {}> = {
-  Component: (props: P) => JSX.Element;
+  Component: ComponentType<P>;
   isInstanceMounted: () => boolean;
 };
 
@@ -99,8 +100,10 @@ const isClassComponent = (component: any) =>
 export default function createUncontrolledClassComponent<
   IComponent extends ReactComponent<P, S>,
   IMethods extends MethodsWithInstance<IComponent>,
-  P = {},
-  S = ComponentState
+  P = IComponent extends ReactComponent<infer IProps> ? IProps : {},
+  S = IComponent extends ReactComponent<any, infer IState>
+    ? IState
+    : ComponentState
 >(
   Comp: CustomComponentClass<IComponent, P, S>,
   methods: IMethods,

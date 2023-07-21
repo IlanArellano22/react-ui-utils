@@ -5,9 +5,9 @@ import {
   type ViewProps,
   ViewMainComponent,
 } from "./comp";
-import { register } from "../Controlled/create";
 import { Sleep } from "../../../common";
 import { EventHandlerRegister } from "../Controlled/manager";
+import { ViewTree } from "./tree";
 export interface ShowFunc {
   <TResult>(
     render: React.ComponentType<ViewProps<TResult>>,
@@ -56,11 +56,15 @@ export type ConditionView = (x: Entry) => boolean;
 
 let INTANCE_NUMBER = 0;
 
+export interface ViewManagerComponentProps {
+  Tree: ViewTree;
+}
+
 export class ViewManagerComponent extends PureComponent<
-  {},
+  ViewManagerComponentProps,
   ViewComponentProps
 > {
-  constructor(props: {}) {
+  constructor(props: ViewManagerComponentProps) {
     super(props);
     this.state = {
       views: [],
@@ -83,7 +87,10 @@ export class ViewManagerComponent extends PureComponent<
           onClose: (result: any) => {
             this.handleClose(currId, resolve)(result);
             let handler: EventHandlerRegister | undefined;
-            if (context && (handler = register.getComponentHandler(context))) {
+            if (
+              context &&
+              (handler = this.props.Tree.getComponentHandler(context))
+            ) {
               const context_id = `${context}_${entry.id}`;
               handler.event.clear(context_id);
             }
@@ -112,7 +119,10 @@ export class ViewManagerComponent extends PureComponent<
         onClose: (res) => {
           this.handleCloseSync(currId);
           let handler: EventHandlerRegister | undefined;
-          if (context && (handler = register.getComponentHandler(context))) {
+          if (
+            context &&
+            (handler = this.props.Tree.getComponentHandler(context))
+          ) {
             const context_id = `${context}_${entry.id}`;
             handler.event.clear(context_id);
           }
@@ -139,8 +149,8 @@ export class ViewManagerComponent extends PureComponent<
     context?: string
   ) => {
     if (context) {
-      const componentDetails = register.getComponentDetails(context);
-      const handler = register.getComponentHandler(context);
+      const componentDetails = this.props.Tree.getComponentDetails(context);
+      const handler = this.props.Tree.getComponentHandler(context);
       if (
         componentDetails &&
         componentDetails.status === "mounted" &&
@@ -165,8 +175,8 @@ export class ViewManagerComponent extends PureComponent<
 
   private startModalSync = (entry: Entry, context?: string) => {
     if (context) {
-      const componentDetails = register.getComponentDetails(context);
-      const handler = register.getComponentHandler(context);
+      const componentDetails = this.props.Tree.getComponentDetails(context);
+      const handler = this.props.Tree.getComponentHandler(context);
       if (
         componentDetails &&
         componentDetails.status === "mounted" &&
@@ -232,11 +242,6 @@ export class ViewManagerComponent extends PureComponent<
   }
 
   render() {
-    return (
-      <>
-        <register.Component />
-        <ViewMainComponent {...this.state} />
-      </>
-    );
+    return <ViewMainComponent {...this.state} />;
   }
 }
