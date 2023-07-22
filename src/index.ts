@@ -10,6 +10,7 @@ import {
   useEventHandler,
   useValueHandler,
 } from "./hooks";
+import { CacheResource } from "./components/Cache";
 
 export {
   ViewManager,
@@ -21,4 +22,5 @@ export {
   useEffectInterval,
   useEventHandler,
   useValueHandler,
+  CacheResource
 };

@@ -10,15 +10,22 @@ import { ViewProps } from "./comp";
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
 } from "../../uncontrolled";
-import { registerTreeComponent } from "./registerTreeComponent";
+import { TreeComponent, registerTreeComponent } from "./registerTreeComponent";
 import { ViewTree } from "./tree";
 
-export interface IViewManager
+export interface ViewUncontrolledComp
   extends UncontrolledComponent<ViewManagerComponentProps> {
   show: ShowFunc;
   showSync: ShowFuncSync;
   removeEntries: (condition?: ConditionView) => void;
 }
+
+export interface ViewMethods {
+  getTree: () => ViewTree;
+  createViewContextComponent: TreeComponent;
+}
+
+export type IViewManager = ViewUncontrolledComp & ViewMethods;
 
 /**Metodo que genera un compomponente que sirve para renderizar un arreglo de componentes dentro de su propio estado
  * el componente llama al metodo asincrono @see `show` para agregar un nuevo objeto que recive como parametros el
@@ -26,10 +33,10 @@ export interface IViewManager
  * una propiedad @see `onClose` que al llamarse elimina el componente del estado devolviendo un resultado
  */
 export namespace ViewManager {
-  export const createViewManager = () => {
+  export const createViewManager = (): IViewManager => {
     const Tree = new ViewTree();
 
-    const manager: IViewManager = createUncontrolledClassComponent(
+    const manager: ViewUncontrolledComp = createUncontrolledClassComponent(
       ViewManagerComponent,
       {
         show: (
@@ -59,12 +66,15 @@ export namespace ViewManager {
       }
     );
 
+    const getTree = () => Tree;
+
     const createViewContextComponent = registerTreeComponent(Tree);
 
     return {
       ...manager,
       Component: () => <manager.Component Tree={Tree} />,
       createViewContextComponent,
+      getTree,
     };
   };
 }

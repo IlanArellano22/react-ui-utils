@@ -17,6 +17,11 @@ export class ViewTree {
   private componentMountEvents: ValueHandler<EventHandlerRegister[]>;
   private components: ValueHandler<ComponentRegister[]>;
 
+  constructor() {
+    this.componentMountEvents = new ValueHandler([]);
+    this.components = new ValueHandler([]);
+  }
+
   public registerComponent(entry: ComponentRegister) {
     this.addEntry(entry);
   }
