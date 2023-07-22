@@ -1,16 +1,21 @@
 import { ContextType, PureComponent, type Context } from "react";
 import {
   CacheConfig,
+  CacheState,
   NamedResource,
   Resource,
   ResourceCacheAction,
 } from "../../types/Cache";
-import { CacheContext, CacheContextProps, getState } from "./context";
+import { CacheContextProps } from "./context";
 import { cacheResourceFuncs } from "./logic";
 
-export class ResourceComponentManager extends PureComponent<any> {
-  static contextType: Context<CacheContextProps> = CacheContext;
-  declare context: ContextType<typeof CacheContext>;
+export interface ResourceComponentManagerProps {
+  getState: () => CacheState;
+}
+
+export class ResourceComponentManager extends PureComponent<ResourceComponentManagerProps> {
+  static contextType: Context<CacheContextProps>;
+  declare context: ContextType<Context<CacheContextProps>>;
   constructor(props: any) {
     super(props);
   }
@@ -22,7 +27,7 @@ export class ResourceComponentManager extends PureComponent<any> {
   ): NamedResource<T, TName> => {
     const { dispatch } = this.context;
     const getResource = () => {
-      const state = getState();
+      const state = this.props.getState();
       return state[name]?.cache || {};
     };
     const depends = resourceConf.depends || [];

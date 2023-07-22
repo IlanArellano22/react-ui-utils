@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import {
   ShowFunc,
   ShowFuncSync,
@@ -21,11 +21,13 @@ export interface ViewUncontrolledComp
 }
 
 export interface ViewMethods {
+  Component: ComponentType;
   getTree: () => ViewTree;
   createViewContextComponent: TreeComponent;
 }
 
-export type IViewManager = ViewUncontrolledComp & ViewMethods;
+export type IViewManager = Omit<ViewUncontrolledComp, "Component"> &
+  ViewMethods;
 
 /**Metodo que genera un compomponente que sirve para renderizar un arreglo de componentes dentro de su propio estado
  * el componente llama al metodo asincrono @see `show` para agregar un nuevo objeto que recive como parametros el
