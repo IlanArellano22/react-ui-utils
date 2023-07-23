@@ -45,6 +45,7 @@ interface ICacheResource
 export namespace CacheResource {
   export const createCacheResource = (): ICacheResource => {
     const context = createCacheContext();
+    context.CacheContext;
 
     const cacheResourceManager: ICacheResource =
       createUncontrolledClassComponent(

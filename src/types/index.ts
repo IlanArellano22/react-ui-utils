@@ -1,3 +1,5 @@
 import { ParametersWithoutFistParam, DeepRecord } from "./validation";
 
-export type { ParametersWithoutFistParam, DeepRecord };
+type _Object = { [key: string]: any };
+
+export type { ParametersWithoutFistParam, DeepRecord, _Object };
