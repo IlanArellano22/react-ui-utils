@@ -2,16 +2,19 @@
   "include": ["src"],
   "exclude": ["lib", "node_modules"],
   "compilerOptions": {
+    //React
+    "jsx": "react",
+    "lib": ["dom", "esnext"],
+    "module": "esnext",
+    "esModuleInterop": true,
+    //General
     "baseUrl": "./src",
     "target": "es5",
-    "module": "esnext",
-    "lib": ["dom", "esnext"],
     "paths": {
       "@ihaz/react-ui-utils": ["./src/index.ts"]
     },
     "sourceMap": true,
     "allowJs": false,
-    "jsx": "react",
     "declaration": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,

@@ -1,19 +1,23 @@
+import { UncontrolledContextValue } from "components/uncontrolled";
 import { ContextType, PureComponent, type Context } from "react";
 import {
+  AppCacheAction,
   CacheConfig,
   CacheState,
   NamedResource,
   Resource,
   ResourceCacheAction,
 } from "../../types/Cache";
-import { CacheContextProps } from "./context";
 import { cacheResourceFuncs } from "./logic";
 
 export interface ResourceComponentManagerProps {
   getState: () => CacheState;
 }
 
-export class ResourceComponentManager extends PureComponent<ResourceComponentManagerProps> {
+interface CacheContextProps
+  extends UncontrolledContextValue<CacheState, AppCacheAction> {}
+
+export class ResourceComponentManager extends PureComponent {
   static contextType: Context<CacheContextProps>;
   declare context: ContextType<Context<CacheContextProps>>;
   constructor(props: any) {
@@ -25,10 +29,10 @@ export class ResourceComponentManager extends PureComponent<ResourceComponentMan
     resource: T,
     resourceConf: CacheConfig<Extract<keyof T, string>>
   ): NamedResource<T, TName> => {
-    const { dispatch } = this.context;
+    const { dispatch, getStore } = this.context;
     const getResource = () => {
-      const state = this.props.getState();
-      return state[name]?.cache || {};
+      const state = getStore();
+      return state?.[name]?.cache || {};
     };
     const depends = resourceConf.depends || [];
     const dispatchResource = (ac: ResourceCacheAction<string>) => {

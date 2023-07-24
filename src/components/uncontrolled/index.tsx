@@ -1,13 +1,18 @@
 import React, {
   Component as ReactComponent,
+  useReducer,
+  createContext,
+} from "react";
+import type {
   ComponentState,
   ComponentType,
   Context,
   StaticLifecycle,
   ValidationMap,
   WeakValidationMap,
-  useReducer,
   Reducer,
+  PropsWithChildren,
+  Dispatch,
 } from "react";
 import { ParametersWithoutFistParam, _Object } from "../../types";
 
@@ -40,22 +45,26 @@ type Methods<
 export type UncontrolledComponent<P = {}> = {
   Component: ComponentType<P>;
   isInstanceMounted: () => boolean;
+  getStore: () => _Object | undefined;
 };
 
 type UncontolledContextAction = {
   type: string;
-  payload: _Object
+  payload: _Object;
+};
+
+export interface UncontrolledContextValue<
+  State = _Object,
+  Action = UncontolledContextAction
+> {
+  getStore: () => State | undefined;
+  dispatch: Dispatch<Action>;
 }
 
-interface UncontrolledContext {
-  context: Context<any>;
-  reducer: (
-    state: _Object,
-    action: UncontolledContextAction
-  )=> _Object
+export interface UncontrolledContext {
+  reducer: (state: _Object, action: UncontolledContextAction) => _Object;
   initialValues: _Object;
 }
-
 
 interface Options {
   strictMode: boolean;
@@ -131,11 +140,30 @@ export default function createUncontrolledClassComponent<
     throw new Error("This Method only allows class components.");
 
   let instance: IComponent | null = null;
-  let store: any = null;
+  let ctx: Context<UncontrolledContextValue> | undefined;
+  let _store: _Object | undefined;
+
+  if (
+    options &&
+    options.contextOptions &&
+    options.contextOptions.initialValues
+  ) {
+    const initial = options.contextOptions.initialValues;
+    const reducer = options.contextOptions.reducer;
+    if (!reducer)
+      throw new Error(
+        "Initial setup context from uncontrolled component needs to declare a reducer"
+      );
+    ctx = createContext<UncontrolledContextValue>({
+      getStore: () => initial,
+      dispatch: () => {},
+    });
+    Comp.contextType = ctx;
+  }
 
   const getInstance = () => instance;
 
-  const getStore = () => store;
+  const getStore = () => _store;
 
   const handleRef = (x: IComponent | null) => {
     instance = x;
@@ -143,28 +171,30 @@ export default function createUncontrolledClassComponent<
 
   const isInstanceMounted = () => !!instance;
 
-  const ComponentContextProvider = () => {
-    const ctxOptions = options && options.contextOptions
-    const ctx = ctxOptions?.context;
+  const ComponentContextProvider = ({ children }: PropsWithChildren) => {
+    const ctxOptions = options && options.contextOptions;
     const reducer = ctxOptions?.reducer;
     const initialValues = ctxOptions?.initialValues;
-    const [value, dispatch] = useReducer(reducer as Reducer<_Object | undefined, UncontrolledContext>, initialValues);
+    const [store, dispatch] = useReducer(
+      reducer as Reducer<_Object | undefined, UncontolledContextAction>,
+      initialValues
+    );
 
-    store = value;
+    _store = store;
 
-    return ctx ?
-    <ctx.Provider value={value}>
+    const getStore = () => store;
 
-    </ctx.Provider>
+    return ctx ? (
+      <ctx.Provider value={{ getStore, dispatch }}>{children}</ctx.Provider>
+    ) : null;
   };
 
   const Component = (props: Readonly<P>) => {
-    if (options && options.contextOptions && options.contextOptions.context) {
-      const ctx = options.contextOptions.context;
+    if (ctx) {
       return (
-        <ctx.Provider value={options.contextOptions.initialValues}>
+        <ComponentContextProvider>
           <Comp {...(props ?? {})} ref={handleRef} />
-        </ctx.Provider>
+        </ComponentContextProvider>
       );
     }
     return <Comp {...(props ?? {})} ref={handleRef} />;
@@ -182,5 +212,5 @@ export default function createUncontrolledClassComponent<
     })
   ) as Methods<IComponent, IMethods>;
 
-  return { Component, isInstanceMounted, ...final };
+  return { Component, isInstanceMounted, getStore, ...final };
 }

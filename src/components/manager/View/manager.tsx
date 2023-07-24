@@ -6,8 +6,7 @@ import {
   ViewMainComponent,
 } from "./comp";
 import { Sleep } from "../../../common";
-import { EventHandlerRegister } from "../Controlled/manager";
-import { ViewTree } from "./tree";
+import { EventHandlerRegister, ViewTree } from "./tree";
 export interface ShowFunc {
   <TResult>(
     render: React.ComponentType<ViewProps<TResult>>,

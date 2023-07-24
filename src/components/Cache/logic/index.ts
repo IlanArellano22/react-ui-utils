@@ -7,7 +7,7 @@ import {
   Resource,
   ResourceCacheAction,
 } from "../../../types/Cache";
-import { emptyFunctionCache } from "../context";
+import { emptyFunctionCache } from "./context";
 import { cacheCall } from "./func";
 
 function getFuncCacheDispatch<T>(

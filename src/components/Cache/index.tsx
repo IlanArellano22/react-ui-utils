@@ -1,7 +1,6 @@
-import React from "react";
-import { createCacheContext } from "./context";
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
+  UncontrolledContext,
 } from "components/uncontrolled";
 import {
   ResourceComponentManager,
@@ -9,6 +8,7 @@ import {
 } from "./manager";
 import { CacheConfig, NamedResource, Resource } from "types/Cache";
 import { createObjectWithGetters } from "common/format";
+import { reducer } from "./logic/context";
 
 type CacheResourceFunc = <T extends Resource<string>, TName extends string>(
   instance: () => ResourceComponentManager,
@@ -44,9 +44,6 @@ interface ICacheResource
 
 export namespace CacheResource {
   export const createCacheResource = (): ICacheResource => {
-    const context = createCacheContext();
-    context.CacheContext;
-
     const cacheResourceManager: ICacheResource =
       createUncontrolledClassComponent(
         ResourceComponentManager,
@@ -55,18 +52,13 @@ export namespace CacheResource {
         },
         {
           strictMode: false,
+          contextOptions: {
+            initialValues: {},
+            reducer: reducer as UncontrolledContext["reducer"],
+          },
         }
       );
 
-    const Component = () => (
-      <context.CacheResourceProvider>
-        <cacheResourceManager.Component getState={context.getState} />
-      </context.CacheResourceProvider>
-    );
-
-    return {
-      ...cacheResourceManager,
-      Component,
-    };
+    return cacheResourceManager;
   };
 }
