@@ -1,5 +1,5 @@
-import { EventHandler } from "common/classes/EventHandler";
-import { ValueHandler } from "common/classes/ValueHandler";
+import { EventHandler } from "@utils/common/classes/EventHandler";
+import { ValueHandler } from "@utils/common/classes/ValueHandler";
 
 export type Status = "mounted" | "unmounted";
 

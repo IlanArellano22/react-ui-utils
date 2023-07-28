@@ -1,9 +1,9 @@
 import React, { forwardRef, useEffect, useMemo, useState } from "react";
-import { Log } from "../../common/log";
+import { Log } from "@utils/common/log";
 import { Form, Input } from "./FormComp";
 import type { FieldProps, FormProps } from "./index";
-import { Client } from "../../common/namespaces/client";
-import { omit } from "../../common";
+import { Client } from "@utils/common/namespaces/client";
+import { omit } from "@utils/common";
 
 export const ControlView = forwardRef<
   any,

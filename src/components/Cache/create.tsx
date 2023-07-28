@@ -1,7 +1,7 @@
 import createUncontrolledClassComponent from "../uncontrolled";
-import { CacheConfig, NamedResource, Resource } from "../../types/Cache";
+import { CacheConfig, NamedResource, Resource } from "@utils/types/Cache";
 import { ResourceComponentManager } from "./manager";
-import { createObjectWithGetters } from "../../common/format";
+import { createObjectWithGetters } from "@utils/common/format";
 
 export type CacheResourceType<
   T extends Resource<string>,

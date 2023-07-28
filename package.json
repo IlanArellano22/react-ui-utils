@@ -9,6 +9,9 @@
   "files": [
     "lib"
   ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IlanArellano/react-ui-utils.git"
@@ -28,6 +31,7 @@
     "react": ">=16"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-commonjs": "^25.0.3",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@testing-library/jest-dom": "^5.17.0",

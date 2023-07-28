@@ -1,4 +1,4 @@
-import { deepEqual, isPromiseLike } from "../../../common";
+import { deepEqual, isPromiseLike } from "@utils/common";
 import {
   CacheEntry,
   CachePayload,
@@ -6,7 +6,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   JSONValue,
-} from "../../../types/Cache";
+} from "@utils/types/Cache";
 
 function syncCacheCall(
   cache: FunctionCache,

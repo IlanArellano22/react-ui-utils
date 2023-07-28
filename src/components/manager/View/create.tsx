@@ -9,7 +9,7 @@ import {
 import { ViewProps } from "./comp";
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
-} from "../../uncontrolled";
+} from "@utils/components/uncontrolled";
 import { TreeComponent, registerTreeComponent } from "./registerTreeComponent";
 import { ViewTree } from "./tree";
 

@@ -5,7 +5,7 @@ import {
   type ViewProps,
   ViewMainComponent,
 } from "./comp";
-import { Sleep } from "../../../common";
+import { Sleep } from "@utils/common";
 import { EventHandlerRegister, ViewTree } from "./tree";
 export interface ShowFunc {
   <TResult>(

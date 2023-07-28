@@ -11,8 +11,12 @@
     "baseUrl": "./src",
     "target": "es5",
     "paths": {
-      "@ihaz/react-ui-utils": ["./src/index.ts"]
+      "@utils/*": ["*"]
     },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ],
     "sourceMap": true,
     "allowJs": false,
     "declaration": true,

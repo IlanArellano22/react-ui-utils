@@ -1,4 +1,4 @@
-import { mapObject } from "../../../common";
+import { mapObject } from "@utils/common";
 import {
   CacheConfig,
   CacheResource,
@@ -6,7 +6,7 @@ import {
   FunctionCacheAction,
   Resource,
   ResourceCacheAction,
-} from "../../../types/Cache";
+} from "@utils/types/Cache";
 import { emptyFunctionCache } from "./context";
 import { cacheCall } from "./func";
 

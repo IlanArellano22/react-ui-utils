@@ -14,7 +14,7 @@ import type {
   PropsWithChildren,
   Dispatch,
 } from "react";
-import { ParametersWithoutFistParam, _Object } from "../../types";
+import { ParametersWithoutFistParam, _Object } from "@utils/types";
 
 interface CustomComponentClass<
   IComponent extends ReactComponent,

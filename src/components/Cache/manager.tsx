@@ -1,5 +1,5 @@
-import { UncontrolledContextValue } from "components/uncontrolled";
 import { ContextType, PureComponent, type Context } from "react";
+import { UncontrolledContextValue } from "@utils/components/uncontrolled";
 import {
   AppCacheAction,
   CacheConfig,
@@ -7,7 +7,7 @@ import {
   NamedResource,
   Resource,
   ResourceCacheAction,
-} from "../../types/Cache";
+} from "@utils/types/Cache";
 import { cacheResourceFuncs } from "./logic";
 
 export interface ResourceComponentManagerProps {

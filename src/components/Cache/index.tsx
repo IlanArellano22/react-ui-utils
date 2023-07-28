@@ -1,13 +1,13 @@
 import createUncontrolledClassComponent, {
   UncontrolledComponent,
   UncontrolledContext,
-} from "components/uncontrolled";
+} from "@utils/components/uncontrolled";
 import {
   ResourceComponentManager,
   ResourceComponentManagerProps,
 } from "./manager";
-import { CacheConfig, NamedResource, Resource } from "types/Cache";
-import { createObjectWithGetters } from "common/format";
+import { CacheConfig, NamedResource, Resource } from "@utils/types/Cache";
+import { createObjectWithGetters } from "@utils/common/format";
 import { reducer } from "./logic/context";
 
 type CacheResourceFunc = <T extends Resource<string>, TName extends string>(

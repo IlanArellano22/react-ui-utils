@@ -7,11 +7,11 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { ItemManager } from "../../types/validation";
+import { ItemManager } from "@utils/types/validation";
 import { ControlForm, ControlView } from "./controlView";
-import { EventHandler, getEventId } from "../../common/classes/EventHandler";
-import { ValueHandler } from "../../common/classes/ValueHandler";
-import { ChangeValueFromObject } from "../../common";
+import { EventHandler, getEventId } from "@utils/common/classes/EventHandler";
+import { ValueHandler } from "@utils/common/classes/ValueHandler";
+import { ChangeValueFromObject } from "@utils/common";
 
 type ValidationPredicate<IValue> = (value: IValue) => boolean;
 

@@ -1,4 +1,4 @@
-import { deepEqual } from "common";
+import { deepEqual } from "@utils/common";
 import {
   AppCacheAction,
   CacheEntry,
@@ -8,7 +8,7 @@ import {
   FunctionCache,
   FunctionCacheAction,
   ResourceCacheAction,
-} from "types/Cache";
+} from "@utils/types/Cache";
 
 export const emptyFunctionCache: FunctionCache = { entries: [] };
 
