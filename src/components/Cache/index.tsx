@@ -2,22 +2,28 @@ import createUncontrolledClassComponent, {
   UncontrolledComponent,
   UncontrolledContext,
 } from "@utils/components/uncontrolled";
-import {
-  ResourceComponentManager,
-  ResourceComponentManagerProps,
-} from "./manager";
+import { ResourceComponentManager } from "./manager";
 import { CacheConfig, NamedResource, Resource } from "@utils/types/Cache";
 import { createObjectWithGetters } from "@utils/common/format";
 import { reducer } from "./logic/context";
 
-type CacheResourceFunc = <T extends Resource<string>, TName extends string>(
+type CacheResourceFuncWithInstance = <
+  T extends Resource<string>,
+  TName extends string
+>(
   instance: () => ResourceComponentManager,
   name: TName,
   resource: T,
   resourceConf: CacheConfig<Extract<keyof T, string>>
 ) => NamedResource<T, TName>;
 
-const cacheResource: CacheResourceFunc = (
+type CacheResourceFunc = <T extends Resource<string>, TName extends string>(
+  name: TName,
+  resource: T,
+  resourceConf: CacheConfig<Extract<keyof T, string>>
+) => NamedResource<T, TName>;
+
+const cacheResource: CacheResourceFuncWithInstance = (
   instance,
   name,
   resource,
@@ -37,14 +43,18 @@ const cacheResource: CacheResourceFunc = (
   };
 };
 
-interface ICacheResource
-  extends UncontrolledComponent<ResourceComponentManagerProps> {
+interface ICacheResourceUncontrolled extends UncontrolledComponent {
+  cacheResource: CacheResourceFuncWithInstance;
+}
+
+export interface ICacheResource
+  extends Omit<ICacheResourceUncontrolled, "cacheResource"> {
   cacheResource: CacheResourceFunc;
 }
 
 export namespace CacheResource {
   export const createCacheResource = (): ICacheResource => {
-    const cacheResourceManager: ICacheResource =
+    const cacheResourceManager: ICacheResourceUncontrolled =
       createUncontrolledClassComponent(
         ResourceComponentManager,
         {
@@ -59,6 +69,6 @@ export namespace CacheResource {
         }
       );
 
-    return cacheResourceManager;
+    return cacheResourceManager as unknown as ICacheResource;
   };
 }

@@ -10,10 +10,6 @@ import {
 } from "@utils/types/Cache";
 import { cacheResourceFuncs } from "./logic";
 
-export interface ResourceComponentManagerProps {
-  getState: () => CacheState;
-}
-
 interface CacheContextProps
   extends UncontrolledContextValue<CacheState, AppCacheAction> {}
 
@@ -29,8 +25,9 @@ export class ResourceComponentManager extends PureComponent {
     resource: T,
     resourceConf: CacheConfig<Extract<keyof T, string>>
   ): NamedResource<T, TName> => {
-    const { dispatch, getStore } = this.context;
+    const { dispatch } = this.context;
     const getResource = () => {
+      const { getStore } = this.context;
       const state = getStore();
       return state?.[name]?.cache || {};
     };
@@ -57,7 +54,7 @@ export class ResourceComponentManager extends PureComponent {
     };
 
     const retResource = cacheResourceFuncs(
-      getResource,
+      getResource.bind(this),
       dispatchResource,
       { maxSize: 1 },
       resource,

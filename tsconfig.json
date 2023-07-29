@@ -10,6 +10,7 @@
     //General
     "baseUrl": "./src",
     "target": "es5",
+    "outDir": "lib",
     "paths": {
       "@utils/*": ["*"]
     },

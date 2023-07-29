@@ -3,6 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import external from "rollup-plugin-peer-deps-external";
 import resolve from "@rollup/plugin-node-resolve";
 import alias from "@rollup/plugin-alias";
+import tsAlias from "./tsAlias.js";
 
 import pkg from "./package.json" assert { type: "json" };
 
@@ -28,7 +29,7 @@ export default {
     typescript({
       exclude: "**/__tests__/**",
       clean: true,
-      typescript: require("ttypescript"),
+      tsconfig: './tsconfig.json',
       tsconfigDefaults: {
         compilerOptions: {
           plugins: [
@@ -56,5 +57,6 @@ export default {
       resolve: [".ts", ".tsx"],
       entries: [{ find: "@utils", replacement: "./src" }],
     }),
+    tsAlias(),
   ],
 };
