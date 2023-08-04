@@ -1,4 +1,5 @@
-import { useCallback, useImperativeHandle, useRef } from "react";
+import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
+import { Execute } from "@utils/common/namespaces/execute";
 import { BaseHandler, ValueHandler } from "../common/classes/ValueHandler";
 
 type Value<IValue> = IValue | (() => IValue);
@@ -11,34 +12,57 @@ type ValueHandlerResult<IValue> = [
   Omit<BaseHandler<IValue>, "value">
 ];
 
-const _initial = <IValue>(initial?: Value<IValue>) =>
-  new ValueHandler(
-    initial instanceof Function ? initial() : initial
-  ) as ValueHandler<IValue>;
+const init = <IValue>(initial?: IValue) =>
+  new ValueHandler(initial) as ValueHandler<IValue>;
 
-/**Hook que maneja un estado interno sin controlar. A diferencia de @see React.useState este hook no actualiza el componente
- * si no que guarda su estado por medio de una referencia que no cambia durante el lifecycle.
+/**Hook that provides an uncontrolled internal state storing the value with ref, meaning the value handler never affects
+ * the component lifecycle
+ * ```tsx
+ * const Example = () => {
+ *const [counter, setCounter] = useValueHandler(0); // initial 0
+ *
+ *
+ * const handleChange = () => {
+ *  setCounter(prev => prev + 1); //increment
+ * console.log(counter()) //value incremented synchronously
+ *}
+ *
+ * return <button onChange={handleChange}>count: {counter()}</button> //Never changes till you change a state that modify the lifecycle component
+ * }
+ * ```
+ *
  */
 export default function useValueHandler<IValue>(
   initial?: Value<IValue>
 ): ValueHandlerResult<IValue> {
   const value = useRef<ValueHandler<IValue> | null>(null);
 
-  useImperativeHandle(
-    value,
-    () => _initial(initial) as ValueHandler<IValue>,
+  const initialResolved = useMemo(
+    () => Execute.executeReturnedValue(initial),
     []
   );
 
-  const get = useCallback(() => value.current?.get() as IValue, []);
+  useImperativeHandle(
+    value,
+    () => init(initialResolved) as ValueHandler<IValue>,
+    []
+  );
+
+  const get = useCallback(() => {
+    const curr = value.current?.get() as IValue;
+
+    return value.current && curr ? curr : (initialResolved as IValue);
+  }, []);
 
   const set = useCallback(
     (newValue: ValueSetter<IValue>, cb?: (value: IValue) => void) => {
-      const final =
-        newValue instanceof Function
-          ? newValue(value.current?.get() as IValue)
-          : newValue;
-      value.current?.set(final);
+      if (!value.current) return;
+      const curr = value.current.get() as IValue;
+      const final = Execute.executeReturnedValue(
+        newValue,
+        value.current && curr ? curr : (initialResolved as IValue)
+      );
+      value.current.set(final);
       if (cb) cb(final);
     },
     []

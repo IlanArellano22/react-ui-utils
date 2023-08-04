@@ -1,8 +1,12 @@
+import { Client } from "../namespaces/client";
+
 export abstract class BaseHandler<T> {
   abstract value: T;
 
   getDeepCopy() {
-    return JSON.parse(JSON.stringify(this.value)) as T;
+    return Client.isClientSide()
+      ? window.structuredClone(this.value)
+      : (JSON.parse(JSON.stringify(this.value)) as T);
   }
 }
 

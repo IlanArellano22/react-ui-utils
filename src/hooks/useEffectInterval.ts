@@ -1,6 +1,5 @@
 import { EffectCallback, useEffect, DependencyList } from "react";
 import { intervalHandler } from "../helpers";
-import useValueHandler from "./useValueHandler";
 
 type EffectResult = void | EffectCallback;
 
@@ -10,16 +9,16 @@ export default function useEffectInterval(
   ms: number,
   inmediate = false
 ) {
-  const [interval] = useValueHandler(() => new intervalHandler());
   useEffect(() => {
+    const interval = new intervalHandler();
     let effectRes: EffectResult | undefined;
     if (inmediate) effectRes = effect();
-    interval().set(() => {
+    interval.set(() => {
       effectRes = effect();
     }, ms);
     return () => {
       if (effectRes && typeof effectRes === "function") effectRes();
-      interval().clear();
+      interval.clear();
     };
   }, deps);
 }
