@@ -10,5 +10,5 @@ export interface ItemManager<IResult, ItemEvents = string> {
     events: ItemEvents,
     callback: (value: IResult) => void
   ) => void;
-  removeEventListenner: (events: ItemEvents) => void;
+  removeEventListenner: (events: ItemEvents, callback: (value: IResult) => void) => void;
 }

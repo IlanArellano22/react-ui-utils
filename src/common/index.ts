@@ -1,4 +1,5 @@
 import { DeepRecord } from "../types";
+import { Client } from "./namespaces/client";
 
 export const Sleep = (ms?: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -90,3 +91,7 @@ export const deepEqual = <
 
   return true;
 };
+
+export const deepCopy = <T>(value: T) => Client.isClientSide()
+? window.structuredClone(value)
+: (JSON.parse(JSON.stringify(value)) as T)

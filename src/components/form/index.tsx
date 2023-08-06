@@ -120,12 +120,11 @@ export function createFormManager<T extends { [key: string]: any }>(
     itemManager: {
       addEventListenner: (event, fn) => {
         const id = getEventId(event);
-        _event.setSelectedId(id);
-        _event.suscribe((value) => fn(value as FormValueState<T>), id);
+        _event.suscribe(id, fn);
       },
-      removeEventListenner: (event) => {
+      removeEventListenner: (event, fn) => {
         const id = getEventId(event);
-        _event.clear(id);
+        _event.clear(id, fn);
       },
     },
     onChange: undefined,
@@ -169,8 +168,7 @@ export function createFormManager<T extends { [key: string]: any }>(
         },
       }));
       const id = getEventId("change");
-      _event.setSelectedId(id);
-      _event.listen({
+      _event.listen(id, {
         value: newValue,
         isValidated: validationPredicate,
       });
@@ -270,16 +268,18 @@ export function createFormManager<T extends { [key: string]: any }>(
     }));
 
     useEffect(() => {
-      itemManager.addEventListenner("change", (state) => {
+      const listenner = (state: FormValueState<T>) => {
         const validated = CheckValidation(state.isValidated);
         setValue({
           value: state.value,
           isValidated: validated,
         });
-      });
+      };
+
+      itemManager.addEventListenner("change", listenner);
 
       return () => {
-        itemManager.removeEventListenner("change");
+        itemManager.removeEventListenner("change", listenner);
       };
     }, []);
 

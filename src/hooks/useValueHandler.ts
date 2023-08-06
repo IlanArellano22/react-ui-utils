@@ -1,16 +1,8 @@
 import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { Execute } from "@utils/common/namespaces/execute";
-import { BaseHandler, ValueHandler } from "../common/classes/ValueHandler";
+import { ValueHandler } from "../common/classes/ValueHandler";
+import { Value, ValueHandlerResult, ValueSetter } from "@utils/types/ValueHandler";
 
-type Value<IValue> = IValue | (() => IValue);
-
-type ValueSetter<IValue> = IValue | ((prev: IValue) => IValue);
-
-type ValueHandlerResult<IValue> = [
-  () => IValue,
-  (value: ValueSetter<IValue>, cb?: (newValue: IValue) => void) => void,
-  Omit<BaseHandler<IValue>, "value">
-];
 
 const init = <IValue>(initial?: IValue) =>
   new ValueHandler(initial) as ValueHandler<IValue>;

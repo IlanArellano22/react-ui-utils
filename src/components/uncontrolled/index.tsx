@@ -2,6 +2,7 @@ import React, {
   Component as ReactComponent,
   useReducer,
   createContext,
+  useEffect,
 } from "react";
 import type {
   ComponentState,
@@ -15,6 +16,7 @@ import type {
   Dispatch,
 } from "react";
 import { ParametersWithoutFistParam, _Object } from "@utils/types";
+import { deepCopy } from "@utils/common";
 
 interface CustomComponentClass<
   IComponent extends ReactComponent,
@@ -142,6 +144,9 @@ export default function createUncontrolledClassComponent<
   let instance: IComponent | null = null;
   let ctx: Context<UncontrolledContextValue> | undefined;
   let _store: _Object | undefined;
+  let mounted_instances = 0;
+
+  const strictMode = options?.strictMode ?? true;
 
   if (
     options &&
@@ -163,7 +168,7 @@ export default function createUncontrolledClassComponent<
 
   const getInstance = () => instance;
 
-  const getStore = () => _store;
+  const getStore = () => Object.freeze(deepCopy(_store));
 
   const handleRef = (x: IComponent | null) => {
     instance = x;
@@ -190,6 +195,19 @@ export default function createUncontrolledClassComponent<
   };
 
   const Component = (props: Readonly<P>) => {
+    useEffect(() => {
+      mounted_instances++;
+      if (mounted_instances > 1) {
+        const message =
+          "Component instance has been declare more than once in DOM";
+        if (strictMode) throw new Error(message);
+        else console.warn(message);
+      }
+      return () => {
+        mounted_instances--;
+      };
+    }, []);
+
     if (ctx) {
       return (
         <ComponentContextProvider>
@@ -204,8 +222,8 @@ export default function createUncontrolledClassComponent<
     Object.entries(methods).map((method) => {
       const [k, func] = method;
       const newFunc = (...args: ParametersWithoutFistParam<typeof func>) => {
-        if (!isInstanceMounted() && (options?.strictMode ?? true))
-          throw Error("El componente aun no ha sido inicializado");
+        if (!isInstanceMounted() && strictMode)
+          throw Error("Component has not been initializated");
         return func(getInstance as () => IComponent, ...args);
       };
       return [k, newFunc];

@@ -15,18 +15,17 @@ export default function useEventHandler<
   const addEventListenner = (event: IEvents, fn: (value: IValue) => void) => {
     const id = getId(event);
     if (eventHandler.current?.isSuscribed(id)) return;
-    eventHandler.current?.suscribe(fn, id);
+    eventHandler.current?.suscribe(id, fn);
   };
 
-  const removeEventListenner = (event: IEvents) => {
+  const removeEventListenner = (event: IEvents, fn: (value: IValue) => void) => {
     const id = getId(event);
-    eventHandler.current?.clear(id);
+    eventHandler.current?.clear(id, fn);
   };
 
   const listen = (event: IEvents, value: IValue) => {
     const id = getId(event);
-    eventHandler.current?.setSelectedId(id);
-    eventHandler.current?.listen(value);
+    eventHandler.current?.listen(id, value);
   };
 
   const listenAll = () => {

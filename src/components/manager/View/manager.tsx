@@ -6,7 +6,7 @@ import {
   ViewMainComponent,
 } from "./comp";
 import { Sleep } from "@utils/common";
-import { EventHandlerRegister, ViewTree } from "./tree";
+import { EventHandlerRegister, VIEW_TREE_EVENT, ViewTree } from "./tree";
 export interface ShowFunc {
   <TResult>(
     render: React.ComponentType<ViewProps<TResult>>,
@@ -53,8 +53,6 @@ export interface ShowFuncSync {
 
 export type ConditionView = (x: Entry) => boolean;
 
-let INTANCE_NUMBER = 0;
-
 export interface ViewManagerComponentProps {
   Tree: ViewTree;
 }
@@ -90,8 +88,7 @@ export class ViewManagerComponent extends PureComponent<
               context &&
               (handler = this.props.Tree.getComponentHandler(context))
             ) {
-              const context_id = `${context}_${entry.id}`;
-              handler.event.clear(context_id);
+              handler.event.clearByEvent(VIEW_TREE_EVENT);
             }
           },
           ...(props || {}),
@@ -122,8 +119,7 @@ export class ViewManagerComponent extends PureComponent<
             context &&
             (handler = this.props.Tree.getComponentHandler(context))
           ) {
-            const context_id = `${context}_${entry.id}`;
-            handler.event.clear(context_id);
+            handler.event.clearByEvent(VIEW_TREE_EVENT);
           }
           if (onCloseListenner) onCloseListenner(res);
         },
@@ -156,14 +152,12 @@ export class ViewManagerComponent extends PureComponent<
         handler
       ) {
         this.addEntry(entry);
-        const context_id = `${context}_${entry.id}`;
-        handler.event.suscribe(() => {
+        handler.event.suscribe(VIEW_TREE_EVENT, () => {
           this.handleClose(entry.id, resolve)(undefined);
-        }, context_id);
-        handler.event.setSelectedId(context_id);
+        });
       } else {
         console.warn(
-          "No se puede renderizar este modal porque el componente anclado al context no esta disponible en el React Tree"
+          `Cannot render this view because the parent component with context ${context} its no longer available in React Tree`
         );
         resolve(undefined);
       }
@@ -182,14 +176,12 @@ export class ViewManagerComponent extends PureComponent<
         handler
       ) {
         this.addEntry(entry);
-        const context_id = `${context}_sync_${entry.id}`;
-        handler.event.suscribe(() => {
+        handler.event.suscribe(VIEW_TREE_EVENT, () => {
           this.handleCloseSync(entry.id);
-        }, context_id);
-        handler.event.setSelectedId(context_id);
+        });
       } else {
         console.warn(
-          "No se puede renderizar este modal porque el componente anclado al context no esta disponible en el React Tree"
+          `Cannot render this view because the parent component with context ${context} its no longer available in React Tree`
         );
       }
     } else {
@@ -227,18 +219,6 @@ export class ViewManagerComponent extends PureComponent<
   private handleCloseSync = (id: number) => {
     this.removeEntry(id);
   };
-
-  componentDidMount() {
-    INTANCE_NUMBER += 1;
-    if (INTANCE_NUMBER > 1)
-      console.warn(
-        "Component View instance has been mounted more than once, it will be cause duplicated views."
-      );
-  }
-
-  componentWillUnmount() {
-    INTANCE_NUMBER = INTANCE_NUMBER - 1 < 0 ? 0 : INTANCE_NUMBER - 1;
-  }
 
   render() {
     return <ViewMainComponent {...this.state} />;

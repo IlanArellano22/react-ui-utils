@@ -13,6 +13,8 @@ export interface EventHandlerRegister {
   event: EventHandler;
 }
 
+export const VIEW_TREE_EVENT = "close";
+
 export class ViewTree {
   private componentMountEvents: ValueHandler<EventHandlerRegister[]>;
   private components: ValueHandler<ComponentRegister[]>;
@@ -40,8 +42,8 @@ export class ViewTree {
     if (entry.status === "unmounted" && this.componentMountEvents) {
       const MountRef = this.getComponentHandler(entry.key);
       if (MountRef) {
-        MountRef.event.listen();
-        MountRef.event.clear();
+        MountRef.event.listen(VIEW_TREE_EVENT);
+        MountRef.event.clearByEvent(VIEW_TREE_EVENT);
       }
     }
   }

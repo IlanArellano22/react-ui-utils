@@ -1,7 +1,5 @@
 type Callback<IValue> = ((value?: IValue) => void) | undefined;
 
-let TOAST_ID = 0;
-
 export const getEventId = (event: string) => `_${event}`;
 
 interface EventsList<IValue> {
@@ -11,30 +9,25 @@ interface EventsList<IValue> {
 
 export class EventHandler<IValue = any> {
   private list: EventsList<IValue>[] = [];
-  private selectedId: string | undefined = undefined;
 
-  suscribe(callback: Callback<IValue>, id?: string) {
-    this.list.push({ callback, id: id ?? (TOAST_ID++).toString() });
+  suscribe(id: string, callback: Callback<IValue>) {
+    this.list.push({ callback, id });
   }
 
   isAnyEventSuscribed = () => !!this.list.length;
 
-  isSuscribed = (id?: string) =>
-    !!this.selectedId &&
-    this.list.some((evt) => evt.id === (id ?? this.selectedId));
+  isSuscribed = (id: string) => this.list.some((evt) => evt.id === id);
 
-  listen(value?: IValue) {
+  listen(id: string, value?: IValue) {
     if (!this.list.length) return;
-    if (!this.selectedId) {
-      const lastEvent = this.list.pop();
-      return this.executeEvent(lastEvent, value);
-    }
-    const selectedEvent = this.list.find((evt) => evt.id === this.selectedId);
-    return this.executeEvent(selectedEvent, value);
+    this.executeEvent(id, value);
   }
 
-  private executeEvent(event: EventsList<IValue> | undefined, value?: IValue) {
-    if (event && event.callback) event.callback(value);
+  private executeEvent(id: string, value?: IValue) {
+    this.list.forEach(x => {
+      if(x.id !== id) return;
+      if(x.callback) x.callback(value);
+    })
   }
 
   listenAll() {
@@ -42,16 +35,16 @@ export class EventHandler<IValue = any> {
     this.clearAll();
   }
 
-  clear(id?: string) {
-    this.list = this.list.filter((evt) => evt.id !== (id ?? this.selectedId));
+  clear(id: string, callback: Callback<IValue>) {
+    this.list = this.list.filter((evt) => evt.id !== id && evt.callback !== callback);
+  }
+
+  clearByEvent(id: string) {
+    this.list = this.list.filter((evt) => evt.id !== id);
   }
 
   clearAll() {
     this.list = [];
-    TOAST_ID = 0;
   }
 
-  setSelectedId(id: string) {
-    this.selectedId = id;
-  }
 }
