@@ -1,8 +1,9 @@
+import { IntervalHandler } from "@utils/common/classes/IntervalHandler";
 import { EffectCallback, useEffect, DependencyList } from "react";
-import { intervalHandler } from "../helpers";
 
 type EffectResult = void | EffectCallback;
 
+/**Hook that execute a callback into a Interval  */
 export default function useEffectInterval(
   effect: () => EffectResult,
   deps: DependencyList,
@@ -10,7 +11,7 @@ export default function useEffectInterval(
   inmediate = false
 ) {
   useEffect(() => {
-    const interval = new intervalHandler();
+    const interval = new IntervalHandler();
     let effectRes: EffectResult | undefined;
     if (inmediate) effectRes = effect();
     interval.set(() => {

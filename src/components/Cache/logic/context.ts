@@ -10,16 +10,16 @@ import {
   ResourceCacheAction,
 } from "@utils/types/Cache";
 
-export const emptyFunctionCache: FunctionCache = { entries: [] };
+export const EMPTY_FUNCTION_CACHE: FunctionCache = { entries: [] };
 
 const CACHE_INITIAL = {} as CacheState;
 
-const errorFunctionCache: (err: Error) => FunctionCache = (err) => ({
+export const errorFunctionCache: (err: Error) => FunctionCache = (err) => ({
   entries: [],
   error: err,
 });
 
-function setCacheEntry(
+export function setCacheEntry(
   cache: FunctionCache,
   config: CacheResourceConfig,
   entry: CacheEntry
@@ -56,13 +56,13 @@ function setExistingCacheEntryByIndex(
   };
 }
 
-function CacheFuncReducer(
+export function CacheFuncReducer(
   cache: FunctionCache,
   action: FunctionCacheAction
 ): FunctionCache {
   switch (action.type) {
     case "clear":
-      return emptyFunctionCache;
+      return EMPTY_FUNCTION_CACHE;
     case "error":
       return errorFunctionCache(action.payload.error);
     case "setEntry":
@@ -81,7 +81,7 @@ function CacheFuncReducer(
   }
 }
 
-function setExistingCacheEntryById(
+export function setExistingCacheEntryById(
   cache: FunctionCache,
   id: number,
   getNewEntry: (old: CacheEntry) => CacheEntry
@@ -91,7 +91,7 @@ function setExistingCacheEntryById(
   return setExistingCacheEntryByIndex(cache, index, getNewEntry);
 }
 
-const cacheReducer = <T>(
+export const cacheReducer = <T>(
   state: CacheResource<T>,
   action: ResourceCacheAction<Extract<keyof T, string>>
 ): CacheResource<T> => {

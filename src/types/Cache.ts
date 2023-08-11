@@ -37,10 +37,10 @@ export type CacheResource<T> = {
   [key in keyof T]: FunctionCache;
 };
 
-export type CacheState = {
+export type CacheState<T = any> = {
   [key: string]:
     | {
-        cache: CacheResource<any>;
+        cache: CacheResource<T>;
         depends: string[];
       }
     | undefined;
@@ -103,6 +103,10 @@ export type Resource<TKeys extends string> = {
   [K in TKeys]: (...args: any[]) => any;
 };
 
+export type ResourceFuncs<T> = {
+  [K in keyof T]: T[K];
+};
+
 export type NamedResource<T extends Resource<string>, TName extends string> = {
   /**Nombre del resource */
   name: TName;
@@ -110,9 +114,7 @@ export type NamedResource<T extends Resource<string>, TName extends string> = {
   depends: string[];
 
   /**Funciones del resource */
-  funcs: {
-    [K in keyof T]: T[K];
-  };
+  funcs: ResourceFuncs<T>;
 };
 
 export type CacheResourceFunc = <
